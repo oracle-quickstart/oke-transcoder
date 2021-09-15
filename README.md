@@ -1,20 +1,17 @@
-# Apache Airflow on OCI OKE
-This quickstart template deploys [Apache Airflow](https://airflow.apache.org/) on [Oracle Kubernetes Engine (OKE)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm).  
+# Transcoder on OCI OKE
+This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on [Oracle Kubernetes Engine (OKE)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm).  
 
 # Pre-Requisites
-Airflow on OKE depends on use of [Instance Principals](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for DAG execution.  You should create a [dynamic group](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm) for the compartment where you are deploying your Airflow OKE cluster.  In this example, I am using a [Default Tag](https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm) for all resources in the target compartment to define the Dynamic Group:
-
-    tag.Airflow.InstancePrincipal.value='Enabled'
-
+Transcoder on OKE depends on use of [Instance Principals](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for container execution.  You should create a [dynamic group](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm) for the compartment where you are deploying your OKE cluster.  
 After creating the group, you should set specific [IAM policies](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/policyreference.htm) for OCI services which you want Airflow to integrate with. 
 
 **Due to enforcement of [OSMS](https://docs.oracle.com/en-us/iaas/os-management/osms/osms-getstarted.htm) for compute resources created using an `manage all-resources` policy, you need to specify each service in a separate policy syntax**
 
 At a minimum, the following policies are required - in this example both the Dynamic Group and target Compartment are "Airflow":
 
-    Allow dynamic-group Airflow to manage cluster-family in compartment Airflow
-    Allow dynamic-group Airflow to manage secret-family in compartment Airflow
-    Allow dynamic-group Airflow to manage vaults in compartment Airflow
+    Allow dynamic-group <dynamic group name> to manage cluster-family in compartment <compartment name>
+    Allow dynamic-group <dynamic group name> to manage secret-family in compartment <compartment name>
+    Allow dynamic-group <dynamic group name> to manage vaults in compartment <compartment name>
 
 The above will allow the Airflow OKE cluster to leverage [KubernetesExecutor](https://airflow.apache.org/docs/apache-airflow/stable/executor/kubernetes.html).  This spins up containers in worker pods on-demand for DAG execution, so there is no need for any persistent infrastructure beyond the Bastion host used to access the cluster, and the webserver & scheduler containers in the Airflow pod.  
 
