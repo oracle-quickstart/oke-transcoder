@@ -131,7 +131,7 @@ After the stack is successfully applied to check that the transcoder is working
 
   kubectl -n transcode get pods
 
-  You should see a transcoder pod is running. 
+  You should see a transcoder pod with the status running or completed 
   
 ![image](https://user-images.githubusercontent.com/54962742/133631899-de1f9791-8802-4335-aa47-66866af779f4.png)
 
