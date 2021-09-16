@@ -89,7 +89,7 @@ After the stack is successfully applied to check that the transcoder is working
 * Check in Event Metrics that a new event is emitted
 * Open OSS stream and check in OSS Metrics that a new request is added to the stream queue
 * SSH the staging-server VVM and check that a new transcoder job is created using:
-  kubectl -n transcode get pods
+  "kubectl -n transcode get pods"
   You should see a transcoder pod is running. 
   
   ![image](https://user-images.githubusercontent.com/54962742/133600135-f40b3a5c-657c-46e4-b29c-193ea44a94d5.png)
