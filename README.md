@@ -49,13 +49,33 @@ The auth token is fetched from OCI Vault Secrets - you will need to capture the 
 
 ![Vault Secret](images/vault_secret.png)
 
-Enabling OKE Cluster Autoscaler is a part of the deployment. Configure the autoscaler image 
+When configuring networking you can use an existing VCN with a private & subnets or create a new VCN and configure CIDR blocks for private & public subnets
+
+![image](https://user-images.githubusercontent.com/54962742/133625296-0b035397-dbc8-449a-b9fe-fe7a9815149b.png)
+
+When configuring OKE cluster you need to define the cluster name and select the Kubernetes version
+
+![image](https://user-images.githubusercontent.com/54962742/133625720-b040cff7-54e4-4f77-9e7d-8f5169ed2ae9.png)
+
+In OKE nodepool configuration you need to specify the nodepool name, the shape and the number of OKE nodes in the nodepool. By default it uses Kubernertes namespace 'transcode' and kube label 'transcode'. It is recommended to keep the default values for the namespace and the kube label.
+
+![image](https://user-images.githubusercontent.com/54962742/133626397-6056a3df-81d0-46e9-a8c2-eda386381eae.png)
+
+Enabling OKE Cluster Autoscaler is a part of the deployment. You need to define the autoscaler image, minimum and maxiumum number of nodes and the number of vCPU requested per a single transcoding job. 
 
 ![image](https://user-images.githubusercontent.com/54962742/133602232-a353e13f-c6ed-4831-9529-c9eacd6fbf74.png)
 
-A user uploads media files to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in the stack variables:
+OCI autoscaler image name depends on the region. For the list of available images per region see
+[Cluster Autoscaler](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm)
+ 
+A user uploads media files to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in Object Storage Bucket Configuration:
 
 ![image](https://user-images.githubusercontent.com/54962742/133596330-1818ef4a-94c1-4e00-b57d-53a96fd43c93.png)
+
+When configuring MySQL parameters define password for both the mysql admin and user accounts
+
+![image](https://user-images.githubusercontent.com/54962742/133627784-19f8afcb-9bfa-4e4b-9c76-01bd9777d600.png)
+
 
 
 # Deployment
