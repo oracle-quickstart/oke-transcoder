@@ -100,7 +100,7 @@ After the stack is successfully applied to check that the transcoder is working
   
     kubectl -n transcode describe pod <pod name>
 
-  If the transcoder pod STATUS is in ERROR state check the pod log
+  If the transcoder pod STATUS is ERROR check the pod log
   
     kubectl -n transcode logs <pod name>
   
