@@ -38,6 +38,7 @@ Also required prior to deployment are an [OCI Registry](https://docs.oracle.com/
 **The OCI registry must be in the tenanacy root and the user account associated with the auth token will need relevant privileges for the repo**
 
 You will need to gather the repo name, and user login to access the registry.  You will also need to configure the registry field to the region where your registry is deployed.
+
 ![image](https://user-images.githubusercontent.com/54962742/133594168-eb66ec6b-e384-4639-9c66-71239b68ab9a.png)
 
 
