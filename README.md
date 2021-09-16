@@ -78,18 +78,10 @@ When configuring MySQL parameters specify password for both the mysql admin and 
 
 # FFPEG Transcoding parameters
 
-By default ffmpeg is set with HLS transcoding to 3 different resolution
+By default ffmpeg is set with HLS transcoding to 3 different resolutions
 
- "-map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M \n
-  -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M \n
-  -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M \n
-  -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 1 -ar 44100 \n
-  -g 48 -sc_threshold 0 -c:v libx264 \n
-  -f hls \n
-  -hls_time 5 \n 
-  -hls_playlist_type vod 
-  -hls_segment_filename stream_%v_%03d.ts
-  -master_pl_name master.m3u8"
+![image](https://user-images.githubusercontent.com/54962742/133630928-e10daf51-e210-4634-bd15-280674f2c0f3.png)
+
 
 ![image](https://user-images.githubusercontent.com/54962742/133629514-3d8600d8-61de-4ae3-bda9-4b5555a46aea.png)
 
