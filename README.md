@@ -49,6 +49,10 @@ The auth token is fetched from OCI Vault Secrets - you will need to capture the 
 
 ![Vault Secret](images/vault_secret.png)
 
+Enabling OKE Cluster Autoscaler is a part of the deployment. Configure the autoscaler image 
+
+![image](https://user-images.githubusercontent.com/54962742/133602232-a353e13f-c6ed-4831-9529-c9eacd6fbf74.png)
+
 A user uploads media files to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in the stack variables:
 
 ![image](https://user-images.githubusercontent.com/54962742/133596330-1818ef4a-94c1-4e00-b57d-53a96fd43c93.png)
