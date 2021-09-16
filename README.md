@@ -97,10 +97,12 @@ After the stack is successfully applied to check that the transcoder is working
   ![image](https://user-images.githubusercontent.com/54962742/133600135-f40b3a5c-657c-46e4-b29c-193ea44a94d5.png)
   
   If the transcoder job fails to start describe the associated pod to check the log
-  kubectl -n transcode describe pod <pod name>
+  
+    kubectl -n transcode describe pod <pod name>
 
   If the transcoder pod STATUS is in ERROR state check the pod log
-  kubectl -n transcode logs <pod name>
+  
+    kubectl -n transcode logs <pod name>
   
  
 * If transcoder pod started successfully attach to the container log and monitor the status
