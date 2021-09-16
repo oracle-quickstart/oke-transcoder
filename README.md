@@ -65,17 +65,39 @@ Enabling OKE Cluster Autoscaler is a part of the deployment. You need to define 
 
 ![image](https://user-images.githubusercontent.com/54962742/133602232-a353e13f-c6ed-4831-9529-c9eacd6fbf74.png)
 
-OCI autoscaler image name depends on the region. For the list of available images per region see
+OCI Cluster Autoscaler image name depends on the region. For the list of available images per region see
 [Cluster Autoscaler](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm)
  
-A user uploads media files to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in Object Storage Bucket Configuration:
+Media files to be transcoded are uploaded to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in Object Storage Bucket Configuration:
 
 ![image](https://user-images.githubusercontent.com/54962742/133596330-1818ef4a-94c1-4e00-b57d-53a96fd43c93.png)
 
-When configuring MySQL parameters define password for both the mysql admin and user accounts
+When configuring MySQL parameters specify password for both the mysql admin and user accounts.
 
 ![image](https://user-images.githubusercontent.com/54962742/133627784-19f8afcb-9bfa-4e4b-9c76-01bd9777d600.png)
 
+# FFPEG Transcoding parameters
+
+By default ffmpeg is set with HLS transcoding to 3 different resolution
+
+  -map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M \n
+  -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M \n
+  -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M \n
+  -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 1 -ar 44100 \n
+  -g 48 -sc_threshold 0 -c:v libx264 \n
+  -f hls \n
+  -hls_time 5 \n 
+  -hls_playlist_type vod 
+  -hls_segment_filename stream_%v_%03d.ts
+  -master_pl_name master.m3u8
+
+![image](https://user-images.githubusercontent.com/54962742/133629514-3d8600d8-61de-4ae3-bda9-4b5555a46aea.png)
+
+If you set transcoding parameters incorrectly transcoding jobs will start failing.
+
+Setting HLS Stream URL is optional. Set it only if you are integrating it with a CDN and you know the CDN base URL
+
+![image](https://user-images.githubusercontent.com/54962742/133629665-a1a58b0a-e107-4891-b747-c553320cc2a8.png)
 
 
 # Deployment
