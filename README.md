@@ -38,8 +38,7 @@ Also required prior to deployment are an [OCI Registry](https://docs.oracle.com/
 **The OCI registry must be in the tenanacy root and the user account associated with the auth token will need relevant privileges for the repo**
 
 You will need to gather the repo name, and user login to access the registry.  You will also need to configure the registry field to the region where your registry is deployed.
-
-![OKE Registry Settings](images/oke_registry_info.png)
+![OKE Registry Settings]](https://user-images.githubusercontent.com/54962742/133593737-d2d766df-32ac-4d08-b7a2-399c4ff7a376.png)
 
 Note that in this example the registry username uses [Oracle Cloud Identity Service Federation](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/federatingIDCS.htm).  If you are not using IDCS and using a local account, simply use the local account login (email address).
 
