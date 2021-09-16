@@ -66,7 +66,7 @@ This template deploys the following:
     * Egress to Internet for both subnets
 * OCI Virtual Machine Staging-Server Instance
 * OCI MySQL as a Service with a database where the list of transcoded filed is stored (transcoded-files table)
-* OKE Cluster with a nodepool where cluster autoscaler is enabled
+* OKE Cluster with a nodepool with cluster autoscaler is enabled
   * Scheduler container 
   * Transcoding container when a new media file is uploaded
 
@@ -89,4 +89,4 @@ You should see a transcoder pod is running. If the pod fails describe it and che
 
 If you see a transcoder pod you can attach to the container log by running
 
-    kubectl -n logs "pod NAME" --follow
+    kubectl -n transcode logs "pod NAME" --follow
