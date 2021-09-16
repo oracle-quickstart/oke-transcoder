@@ -72,27 +72,37 @@ This template deploys the following:
     * Egress to Internet for both subnets
 * OCI Virtual Machine Staging-Server Instance
 * OCI MySQL as a Service with a database where the list of transcoded filed is stored (transcoded-files table)
+* OCI Streaming Service (OSS) stream for transocding requests
+* Event rule that sends a transcoding request to OSS stream when a new file is uploaded to OCI Object Storage Source Bucket
 * OKE Cluster with a nodepool with cluster autoscaler is enabled
-  * Scheduler container 
-  * Transcoding container when a new media file is uploaded
-
+  * Scheduler container checking OSS stream for transcoding requests
+  * Transcoding container is started when a new media file is uploaded
 
 Simply click the Deploy to OCI button to create an ORM stack, then walk through the menu driven deployment.  Once the stack is created, use the Terraform Actions drop-down menu to Plan, then Apply the stack.
 
 [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-quickstart/oke-airflow/archive/2.0.0.zip)
     
-Remote execution logging is done in terraform output directly. 
+When applying the stack remote execution logging is done in terraform output directly. When the stack is successfully applied it prints SSH key and public IP address of the staging-server VM. SSH access is enabled to the staging-server VM. 
 
-Upload a new video file to the source OS bucket and check in Event Metrics that a new event is emitted. 
+After the stack is successfully applied to check that the transcoder is working
+* Upload a new video file to the OCI Object Storage Source Bucket
+* Check in Event Metrics that a new event is emitted
+* Open OSS stream and check in OSS Metrics that a new request is added to the stream queue
+* SSH the staging-server VVM and check that a new transcoder job is created using:
+  kubectl -n transcode get pods
+  You should see a transcoder pod is running. 
+  
+  ![image](https://user-images.githubusercontent.com/54962742/133600135-f40b3a5c-657c-46e4-b29c-193ea44a94d5.png)
+  
+  If the transcoder job fails to start describe the associated pod to check the log
+  kubectl -n transcode describe pod <pod name>
 
-If you see a new event emitted, go to OSS stream and check in OSS Metrics that a new request is added to the queue
-
-After that check that a new transcoder job is created
-
-kubectl -n transcode get pods
-
-You should see a transcoder pod is running. If the pod fails describe it and check the log.
-
-If you see a transcoder pod you can attach to the container log by running
+  If the transcoder pod STATUS is in ERROR state check the pod log
+  kubectl -n transcode logs <pod name>
+  
+ 
+* If transcoder pod started successfully attach to the container log and monitor the status
 
     kubectl -n transcode logs "pod NAME" --follow
+    
+* If the transcoder pod status is COMPLETED check OCI Object Storage Destination Bucket. For each transcoded file it creates a folder in the Destination Bucket with HLS manifest files (*.m3us) and segment files (*.ts) 
