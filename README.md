@@ -49,6 +49,10 @@ The auth token is fetched from OCI Vault Secrets - you will need to capture the 
 
 ![Vault Secret](images/vault_secret.png)
 
+A user uploads media files to OCI Object Storage Source Bucket. The transcoded files are stored in OCI Object Storage Destination Bucket. Both Source and Destination Buckets must be pre-created in advance and their names should be configured in the stack variables:
+
+![image](https://user-images.githubusercontent.com/54962742/133595894-4655c24d-f60f-4858-bc5b-8fca7d0e409d.png)
+
 # Deployment
 The main branch of this deployment uses [Oracle Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm).  The shell branch uses stand-alone Terraform (CLI).   
 
