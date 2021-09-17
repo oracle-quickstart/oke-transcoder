@@ -53,6 +53,8 @@ module "oke" {
   oke_nodepool_name = var.oke_nodepool_name
   oke_nodepool_shape = var.oke_nodepool_shape
   oke_nodepool_size = var.oke_nodepool_size
+  oke_node_ocpu = var.oke_node_ocpu
+  oke_node_memory = var.oke_node_memory
   cluster_options_add_ons_is_kubernetes_dashboard_enabled =  var.cluster_options_add_ons_is_kubernetes_dashboard_enabled
   cluster_options_admission_controller_options_is_pod_security_policy_enabled = var.cluster_options_admission_controller_options_is_pod_security_policy_enabled
   image_id = data.oci_core_images.oraclelinux7.images.0.id 

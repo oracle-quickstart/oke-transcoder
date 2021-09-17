@@ -118,6 +118,11 @@ resource "oci_core_security_list" "PrivateSubnet" {
     protocol = "6"
     source   = var.VCN_CIDR
   }
+
+  ingress_security_rules {
+    protocol = "all"
+    source   = var.private_cidr
+  }
 }
 
 resource "oci_core_subnet" "edge" {

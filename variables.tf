@@ -89,7 +89,15 @@ variable "oke_nodepool_name" {
 }
 
 variable "oke_nodepool_shape" {
-  default = "VM.Standard2.2"
+  default = "VM.Standard.E3.Flex"
+}
+
+variable "oke_node_ocpu" {
+  default = 2
+}
+
+variable "oke_node_memory" {
+  default = 32
 }
 
 variable "oke_nodepool_size" {
@@ -287,7 +295,7 @@ variable "ffmpeg_stream_map" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "hls_stream_url" {
-  default = "CDN URL"
+  default = ""
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

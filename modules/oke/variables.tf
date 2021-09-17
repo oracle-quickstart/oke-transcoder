@@ -8,6 +8,8 @@ variable "kubernetes_version" {}
 variable "oke_nodepool_name" {}
 variable "oke_nodepool_shape" {}
 variable "oke_nodepool_size" {}
+variable "oke_node_ocpu" {}
+variable "oke_node_memory" {}
 variable "cluster_options_add_ons_is_kubernetes_dashboard_enabled" {}
 variable "cluster_options_admission_controller_options_is_pod_security_policy_enabled" {}
 variable "image_id" {}

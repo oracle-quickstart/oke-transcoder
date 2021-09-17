@@ -44,6 +44,14 @@ resource "oci_containerengine_node_pool" "oke_node_pool" {
     size = var.oke_nodepool_size
   }
 
+  dynamic "node_shape_config" {
+    for_each = length(regexall("Flex", var.oke_nodepool_shape)) > 0 ? [1] : []
+    content {
+      ocpus         = var.oke_node_ocpu
+      memory_in_gbs = var.oke_node_memory
+    }
+  }
+
   node_source_details {
     source_type = "IMAGE"
     image_id    = var.image_id

@@ -35,6 +35,8 @@ groupings:
   - oke_nodepool_name
   - oke_nodepool_shape
   - oke_nodepool_size
+  - oke_node_ocpu
+  - oke_node_memory
   - oke_namespace
   - kube_label
 - title: "OKE Cluster Autoscaling Configuration"
@@ -254,7 +256,7 @@ variables:
     visible: create_new_oke_cluster
     dependsOn:
       compartmentId: compartment_ocid
-    default: "VM.Standard2.2"
+    default: "VM.Standard.E3.Flex"
 
   oke_nodepool_size:
     type: int
@@ -263,6 +265,22 @@ variables:
     min: 1
     default: 1
     required: true
+    visible: create_new_oke_cluster
+
+  oke_node_ocpu:
+    type: int
+    title: "OKE Node OCPU number"
+    description: "Enter a value, minimum 1"
+    min: 1
+    default: 2
+    visible: create_new_oke_cluster
+
+  oke_node_memory:
+    type: int
+    title: "OKE Node memory in GB"
+    description: "Enter a value, minimum 16"
+    min: 1
+    default: 32
     visible: create_new_oke_cluster
 
   oke_namespace:
