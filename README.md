@@ -59,7 +59,7 @@ When configuring OKE cluster you need to define the cluster name and select the 
 
 In OKE nodepool configuration you need to specify the nodepool name, the shape and the number of OKE nodes in the nodepool. By default it uses Kubernertes namespace 'transcode' and kube label 'transcode'. It is recommended to keep the default values for the namespace and the kube label.
 
-![image](https://user-images.githubusercontent.com/54962742/133626397-6056a3df-81d0-46e9-a8c2-eda386381eae.png)
+![image](https://user-images.githubusercontent.com/54962742/133734380-611681c2-dcf4-49b1-8df9-394eac011859.png)
 
 Enabling OKE Cluster Autoscaler is a part of the deployment. You need to define the autoscaler image, minimum and maxiumum number of nodes and the number of vCPU requested per a single transcoding job. 
 
