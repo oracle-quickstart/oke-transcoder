@@ -186,7 +186,8 @@ data "template_file" "install_docker" {
   }
 }
 resource "null_resource" "install_docker" {
-
+  depends_on = [null_resource.install_oci_cli]
+  
   connection {
     host        = var.instance_ip
     private_key = var.ssh_private_key

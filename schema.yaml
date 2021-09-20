@@ -109,6 +109,9 @@ variables:
     description: "Copy/Paste the contents of your SSH Public Key"
     required: true 
     default: ""
+    visible:
+      not:
+        - use_remote_exec
 
   create_new_oke_cluster:
     type: boolean

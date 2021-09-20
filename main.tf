@@ -20,7 +20,6 @@ module "oci-stream" {
   stream_name = var.stream_name
   stream_partitions = var.stream_partitions
   stream_retention_in_hours = var.stream_retention_in_hours
-#  subnet_id =  var.useExistingVcn ? var.OKESubnet : local.is_oke_public
 }
 
 module "oci-event" {
