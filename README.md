@@ -115,7 +115,7 @@ It deploys the following:
 * OCI MySQL as a Service with a database where the list of transcoded filed is stored (transcoded-files table)
 * OCI Streaming Service (OSS) stream for transcoding requests
 * Event rule that sends a transcoding request to OSS stream when a new file is uploaded to OCI Object Storage Source Bucket
-* OKE Cluster with a nodepool with cluster autoscaler is enabled
+* OKE Cluster with a nodepool with enabled cluster autoscaler
   * Scheduler container checking OSS stream for transcoding requests
   * Transcoding container is started when a new media file is uploaded
 
