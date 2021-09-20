@@ -113,7 +113,7 @@ It deploys the following:
     * Egress to Internet for both subnets
 * OCI Virtual Machine Staging-Server Instance
 * OCI MySQL as a Service with a database where the list of transcoded filed is stored (transcoded-files table)
-* OCI Streaming Service (OSS) stream for transocding requests
+* OCI Streaming Service (OSS) stream for transcoding requests
 * Event rule that sends a transcoding request to OSS stream when a new file is uploaded to OCI Object Storage Source Bucket
 * OKE Cluster with a nodepool with cluster autoscaler is enabled
   * Scheduler container checking OSS stream for transcoding requests
