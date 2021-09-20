@@ -49,7 +49,7 @@ The auth token is fetched from OCI Vault Secrets - you will need to capture the 
 
 ![Vault Secret](images/vault_secret.png)
 
-When configuring networking you can use an existing VCN with a private & subnets or create a new VCN and configure CIDR blocks for private & public subnets
+When configuring networking you can use an existing VCN with a private & subnets or create a new VCN and configure CIDR blocks for private & public subnets. If you select not to use an existing VCN the deployment template will create a new VCN with all required networking configuration.  If you select to use an existing VCN you must insure that it has a private and a public subnet, Internet Gateway, NAT Gateway, Service Gateway with the associated routing rules in the route table. When using an existing VCN enable in the secuity list of the private subnet all traffic to all ports inside the subnet, open MySQL TCP port 3306 for the traffic from the public (edge) subnet. In addition, insure that all ports required by OKE cluster are open (see https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm#securitylistconfig). 
 
 ![image](https://user-images.githubusercontent.com/54962742/133625296-0b035397-dbc8-449a-b9fe-fe7a9815149b.png)
 
@@ -94,9 +94,9 @@ Setting HLS Stream URL is optional. Set it only if you are integrating it with a
 
 
 # Deployment
-The main branch of this deployment uses [Oracle Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm).  The shell branch uses stand-alone Terraform (CLI).   
+This deployment template uses [Oracle Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm). 
 
-This template deploys the following:
+It deploys the following:
 
 * Virtual Cloud Network
   * Public (Edge) Subnet
