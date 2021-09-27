@@ -49,5 +49,7 @@ else
   URL=""
 fi
 
-mysql -h $DB_HOST -u $DB_USER -p"$DB_PWD" -D $DB_NAME -e "delete from transcoded_files where name='$INPUT_FILE'; insert into transcoded_files (name, bucket, object, url, create_dat
-e) values ('$INPUT_FILE', '$OUTPUT_BUCKET', '$INPUT_FILE/master.m3u8', '$URL', now())"
+echo "Uploading thumbnail file to $TC_DST_BUCKET OS bucket"
+oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $THUMB_FILE --name thumbnails/$THUMB_FILE --force --auth instance_principal
+
+mysql -h $DB_HOST -u $DB_USER -p"$DB_PWD" -D $DB_NAME -e "delete from transcoded_files where name='$INPUT_FILE'; insert into transcoded_files (name, bucket, object, url, create_date, thumbnail) values ('$INPUT_FILE', '$OUTPUT_BUCKET', '$INPUT_FILE/master.m3u8', '$URL', now(), 'thumbnails/$THUMB_FILE')"
