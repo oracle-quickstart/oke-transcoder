@@ -10,6 +10,7 @@ DB_HOST=$TC_DB_HOST
 DB_NAME=$TC_DB_NAME
 DB_USER=$TC_DB_USER
 DB_PWD=$TC_DB_PASSWORD
+THUMB_FILE=$INPUT_FILE'_thumb.png'
 
 #Download the input file from OCI object storage
 echo "Downloading file $INPUT_FILE from $INPUT_BUCKET OS bucket"
@@ -27,6 +28,8 @@ cd $OUTPUT_DIR
 echo "Transcoding file $INPUT_FILE"
 ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "$TC_FFMPEG_STREAM_MAP" stream_%v.m3u8
 
+echo "Creating Thumbnail for $INPUT_FILE"
+ffmpeg -i $ifile -ss 00:00:14.435 -s 1280x720 -frames:v 1 $THUMB_FILE
   
 #Upload the transcoded files to OCI object storage bucket
 echo "Uploading transcoded files to $TC_DST_BUCKET OS bicket"

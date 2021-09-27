@@ -19,6 +19,7 @@ create table if not exists transcoded_files(
    object VARCHAR(100) NOT NULL, 
    url VARCHAR(100) NOT NULL, 
    create_date DATETIME NOT NULL,
+   thumbnail VARCHAR(100),
    PRIMARY KEY ( id )
 );
 EOF
