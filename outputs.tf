@@ -3,3 +3,8 @@ output "INFO" { value = var.use_remote_exec ? "Remote Execution used for deploym
 output "SSH_PRIVATE_KEY" { 
    value = nonsensitive(var.use_remote_exec ? tls_private_key.oke_ssh_key.private_key_pem : "SSH Key provided by user" )
 }
+
+output "CONNECT_DB_FROM_STAGING_SERVER" {
+	value = "mysql -h var.db_ip -u var.db_user -D var.db_name -p"	
+}
+
