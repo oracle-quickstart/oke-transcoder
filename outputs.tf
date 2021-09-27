@@ -5,6 +5,6 @@ output "SSH_PRIVATE_KEY" {
 }
 
 output "CONNECT_DB_FROM_STAGING_SERVER" {
-	value = "mysql -h var.db_ip -u var.db_user -D var.db_name -p"	
+	value = "mysql -h ${var.db_ip} -u ${var.db_user} -D ${var.db_name} -p"	
 }
 
