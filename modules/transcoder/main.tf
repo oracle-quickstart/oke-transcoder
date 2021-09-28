@@ -220,10 +220,6 @@ data "template_file" "consumer" {
 data "template_file" "new_job" {
   template = file("${path.module}/../../userdata/scheduler/new_job.py")
 }
-data "template_file" "build_scheduler_docker_image" {
-  template = file("${path.module}/../../userdata/scheduler/build.sh")
-}
-
 
 resource "null_resource" "build_scheduler_docker_image" {
   depends_on = [null_resource.install_docker]
@@ -260,7 +256,6 @@ resource "null_resource" "build_scheduler_docker_image" {
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/scheduler",
-      "chmod +x build.sh",
       "docker build -t scheduler:${var.image_label} . --no-cache"
     ]
   }
@@ -305,7 +300,6 @@ resource "null_resource" "build_transcoder_docker_image" {
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/transcode",
-      "chmod +x build.sh",
       "docker build -t transcoder:${var.image_label} . --no-cache"
     ]
   }

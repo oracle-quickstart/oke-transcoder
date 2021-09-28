@@ -17,4 +17,4 @@ RUN ln -s /app/ffmpeg-4.4-amd64-static/ffmpeg /usr/local/bin/ffmpeg
 RUN ln -s /app/ffmpeg-4.4-amd64-static/ffprob /usr/local/bin/ffprob
 
 ADD transcode.sh /app/transcode.sh
-
+RUN chmod +x /app/transcode.sh
