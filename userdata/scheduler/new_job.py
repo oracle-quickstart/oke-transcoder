@@ -10,12 +10,13 @@ def create_job_object(os_file):
     repo=os.environ['TC_OCIR_REPO']
     oke_nodepool = os.environ['TC_OKE_NODEPOOL']
     cpu_per_job = os.environ['TC_CPU_REQUEST_PER_JOB']
+    image_label = os.environ['TC_IMAGE_LABEL']
     requested_resources=client.V1ResourceRequirements(
         requests={"cpu": cpu_per_job}
     )
     container = client.V1Container(
         name="transcoder",
-        image=repo+"/transcoder:latest",
+        image=repo+"/transcoder:"+image_label,
         env_from=[ client.V1EnvFromSource( config_map_ref=client.V1ConfigMapEnvSource(name="transcoder-config") ) ],
         env=[client.V1EnvVar(name="TC_DB_PASSWORD", value_from=client.V1EnvVarSource(secret_key_ref=client.V1SecretKeySelector(key="password", name="db-password")))],
         resources=requested_resources,
