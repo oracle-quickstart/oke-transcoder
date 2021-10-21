@@ -118,6 +118,7 @@ It deploys the following:
 * OKE Cluster with a nodepool with enabled cluster autoscaler
   * Scheduler container checking OSS stream for transcoding requests
   * Transcoding container is started when a new media file is uploaded
+  * API-server container with LB service (serving REST API requests with a public endpoint) 
 
 Simply click the Deploy to OCI button to create an ORM stack, then walk through the menu driven deployment.  Once the stack is created, use the Terraform Actions drop-down menu to Plan, then Apply the stack.
 
@@ -152,3 +153,5 @@ After the stack is successfully applied to check that the transcoder is working
     kubectl -n transcode logs "pod NAME" --follow
     
   If the transcoder pod status is COMPLETED check OCI Object Storage Destination Bucket. For each transcoded file it creates a folder in the Destination Bucket with HLS manifest files (*.m3us) and segment files (*.ts)
+
+  [Transcoder REST API documentation] (https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.docx) 
