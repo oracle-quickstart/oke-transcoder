@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: job-scheduler
+  name: transcoder
   namespace: transcode
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: job-scheduler-role
+  name: transcoder-role
   namespace: transcode
 rules:
   - apiGroups: ["batch", "extensions"]
@@ -16,7 +16,7 @@ rules:
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: [""]
     resources: ["configmaps"]
-    verbs: ["get", "watch", "list"]
+    verbs: ["get", "watch", "list", "create", "patch"]
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "watch", "list"]
@@ -33,14 +33,14 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: job-scheduler-rolebinding
+  name: transcoder-rolebinding
   namespace: transcode
 subjects:
   - kind: ServiceAccount
-    name: job-scheduler
+    name: transcoder
 roleRef:
   kind: Role
-  name: job-scheduler-role
+  name: transcoder-role
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1
@@ -60,14 +60,14 @@ spec:
       labels:
         app: job-scheduler
     spec:
-      serviceAccountName: job-scheduler
+      serviceAccountName: transcoder
       containers:
       - name: "scheduler"
         image: ${registry}/${tenancy_name}/${repo_name}/${image_name}:${image_label}
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
-            name: transcoder-config
+            name: ${project_name}
         command: ["python3", "/app/consumer.py"]
       imagePullSecrets:
         - name: ocir-secret

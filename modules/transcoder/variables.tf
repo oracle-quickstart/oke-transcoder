@@ -34,6 +34,9 @@ variable "cluster_autoscaling" {}
 variable "oci_cluster_autoscaler_image" {}
 variable "min_worker_nodes" {}
 variable "max_worker_nodes" {}
+variable "ssl_cert_subject" {}
+variable "project_name" {}
+variable "event_rule_id" {}
 
 
 

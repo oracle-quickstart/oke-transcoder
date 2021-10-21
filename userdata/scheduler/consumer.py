@@ -32,14 +32,15 @@ def simple_message_loop(client, stream_id, initial_cursor, src_bucket):
 #              print(b64decode(message.value.encode()).decode())
               msg_body = json.loads(b64decode(message.value.encode()).decode())
               if msg_body['eventType']=='com.oraclecloud.objectstorage.createobject' and \
-                 msg_body['source']=='ObjectStorage' and \
-                 msg_body['data']['additionalDetails']['bucketName']==src_bucket:
+                 msg_body['source']=='ObjectStorage':
 
                  new_file = msg_body['data']['resourceName']
-                 print("New file {} found".format(new_file), flush=True)
+                 bucket_name = msg_body['data']['additionalDetails']['bucketName']
+
+                 print("New file {0} found in bucket {1}".format(new_file, bucket_name), flush=True)
  
                  #Create a new job and pass the file name and job name
-                 p = subprocess.call(['python3', 'new_job.py', new_file]) 
+                 p = subprocess.call(['python3', 'new_job.py', bucket_name, new_file]) 
             except subprocess.CalledProcessError as e:
                 print(e, flush=True) 
                 exit(1)

@@ -1,10 +1,6 @@
 #?/bin/bash
 set -x
 
-#build_dir="$HOME/airflow/build"
-#mkdir -p $build_dir
-#cd $build_dir
-
 # Create airflow namespace (if it does not exist)
 kubectl get namespaces | grep ${namespace}
 if [[ $? -ne 0 ]]; then
@@ -28,6 +24,14 @@ kubectl -n ${namespace} apply -f configmap.yaml
 # Create secret (encoded DB password)
 kubectl -n ${namespace} apply -f db-secret.yaml
 
-# Deploy airflow containers
+# Deploy scheduler container
 kubectl -n ${namespace} apply -f scheduler.yaml
+
+# Deploy api-server container
+kubectl -n ${namespace} apply -f api-server.yaml
+
+# Add the project to DB Projects table
+mysql -h ${db_ip} -D ${db_name} -u ${db_user} -p${db_password} -e \
+"delete from projects where name = '${project_name}'; insert into projects (name, input_bucket, output_bucket, state) values ('${project_name}', '${src_bucket}', '${dst_bucket}', 'active')"
+
 

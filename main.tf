@@ -31,7 +31,8 @@ module "oci-event" {
 
 module "oci-mysql" {
   source = "./modules/oci-mysql"
-  availability_domain = data.oci_identity_availability_domain.ad.name
+#  availability_domain = data.oci_identity_availability_domain.ad.name
+  availability_domain = var.availability_domain
   compartment_ocid = var.compartment_ocid
   mysqladmin_password = var.mysql_admin_password
   mysqladmin_username = var.mysql_admin_username
@@ -69,7 +70,8 @@ module "stg-server" {
   source = "./modules/stg-server"
   user_data = var.use_remote_exec ? base64encode(file("userdata/scripts/init.sh")) : base64encode(file("userdata/scripts/cloudinit.sh"))
   compartment_ocid = var.compartment_ocid
-  availability_domain = data.oci_identity_availability_domain.ad.name
+#  availability_domain = data.oci_identity_availability_domain.ad.name
+  availability_domain = var.availability_domain
   image_id = data.oci_core_images.oraclelinux7.images.0.id 
   instance_shape   = var.stg_server_shape
   instance_name = var.stg_server_name
@@ -134,4 +136,7 @@ module "transcoder" {
   oci_cluster_autoscaler_image = var.oci_cluster_autoscaler_image
   min_worker_nodes = var.min_worker_nodes
   max_worker_nodes = var.max_worker_nodes
+  ssl_cert_subject = var.ssl_cert_subject
+  project_name = var.project_name
+  event_rule_id = module.oci-event.event_rule_id
 }

@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: transcoder-config
+  name: "${project_name}"
   namespace: transcode
 data:
   TC_STREAM_ENDPOINT: "${stream_endpoint}"  
-  TC_STREAM_OCID: "${stream_ocid}"  
+  TC_STREAM_OCID: "${stream_ocid}" 
+  TC_PROJECT_NAME:  "transcode"
   TC_SRC_BUCKET: "${src_bucket}"
   TC_DST_BUCKET: "${dts_bucket}"
   TC_OS_NAMESPACE: "${os_namespace}"

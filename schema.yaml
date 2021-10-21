@@ -81,6 +81,7 @@ groupings:
   - edgeSubnet
 - title: "Transcoding Configuration"
   variables:
+  - project_name
   - ffmpeg_config
   - ffmpeg_stream_map
 - title: "CDN Configuration"
@@ -361,7 +362,7 @@ variables:
   image_label: 
     type: string
     title: "Transcoder Image Label"
-    default: "1.0"
+    default: "1.1"
     required: true
 
   src_bucket: 
@@ -476,6 +477,11 @@ variables:
     visible:
       not:
         - use_remote_exec
+
+  project_name:
+    type: string
+    title: "Project Name"
+    required: true
 
   ffmpeg_config:
     type: string

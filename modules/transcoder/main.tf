@@ -219,6 +219,12 @@ data "template_file" "consumer" {
 }
 data "template_file" "new_job" {
   template = file("${path.module}/../../userdata/scheduler/new_job.py")
+  vars = {
+    db_host = var.db_ip
+    db_name = var.db_name
+    db_user = var.db_user
+    db_password = var.db_password
+  }
 }
 
 resource "null_resource" "build_scheduler_docker_image" {
@@ -305,7 +311,65 @@ resource "null_resource" "build_transcoder_docker_image" {
   }
 }
 
-# Push sheduler and transcoder docker images to OCIR registry
+
+# Build api-server docker image
+data "template_file" "api_dockerfile" {
+  template = file("${path.module}/../../userdata/api/Dockerfile")
+}
+data "template_file" "api_bootstrap" {
+  template = file("${path.module}/../../userdata/api/bootstrap.sh")
+}
+data "template_file" "api_index" {
+  template = file("${path.module}/../../userdata/api/index.py")
+  vars = {
+    namespace = var.namespace
+    event_rule_id = var.event_rule_id
+  }
+}
+
+resource "null_resource" "build_api_docker_image" {
+  depends_on = [null_resource.install_docker]
+
+  connection {
+    host        = var.instance_ip
+    private_key = var.ssh_private_key
+    timeout     = "40m"
+    type        = "ssh"
+    user        = "opc"
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p $HOME/transcoder/api"
+        ]
+  }
+
+
+  provisioner "file" {
+    content     = data.template_file.api_dockerfile.rendered
+    destination = "~/transcoder/api/Dockerfile"
+  }
+  
+  provisioner "file" {
+    content     = data.template_file.api_bootstrap.rendered
+    destination = "~/transcoder/api/bootstrap.sh"
+  }
+
+  provisioner "file" {
+    content     = data.template_file.api_index.rendered
+    destination = "~/transcoder/api/index.py"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "cd $HOME/transcoder/api",
+      "openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 -subj ${var.ssl_cert_subject}",
+      "docker build -t api-server:${var.image_label} . --no-cache"
+    ]
+  }
+}
+
+# Push sheduler and transcoder and api-server docker images to OCIR registry
 data "template_file" "push_to_registry" {
   template = file("${path.module}/../../userdata/scripts/push_to_registry.sh")
   vars = {
@@ -320,7 +384,7 @@ data "template_file" "push_to_registry" {
 }
 
 resource "null_resource" "push_to_registry" {
-  depends_on = [null_resource.install_docker, null_resource.build_scheduler_docker_image, null_resource.build_transcoder_docker_image]
+  depends_on = [null_resource.install_docker, null_resource.build_scheduler_docker_image, null_resource.build_transcoder_docker_image, null_resource.build_api_docker_image]
 
   connection {
     host        = var.instance_ip
@@ -340,7 +404,8 @@ resource "null_resource" "push_to_registry" {
       "cd $HOME/transcoder/build",
       "chmod +x push_to_registry.sh",
       "./push_to_registry.sh scheduler",
-      "./push_to_registry.sh transcoder"
+      "./push_to_registry.sh transcoder",
+      "./push_to_registry.sh api-server"
     ]
   }
 }
@@ -390,8 +455,8 @@ resource "null_resource" "cluster_autoscaler" {
 
 # Deploy scheduler container on OKE
 
-data "template_file" "scheduler" {
-  template = file("${path.module}/../../userdata/scripts/deploy_scheduler.sh")
+data "template_file" "deploy" {
+  template = file("${path.module}/../../userdata/scripts/deploy.sh")
   vars = {
     secret_id = var.secret_id
     registry = var. registry
@@ -401,12 +466,20 @@ data "template_file" "scheduler" {
     region = var.region
     image_label = var.image_label
     namespace = var.namespace
+    db_ip = var.db_ip
+    db_name = var.db_name
+    db_user = var.db_user
+    db_password = var.db_password
+    project_name = var.project_name
+    src_bucket = var.src_bucket
+    dst_bucket = var.dst_bucket
   }
 }
 
 data "template_file" "configmap_template" {
   template = file("${path.module}/../../userdata/templates/configmap.yaml.template")
   vars = {
+    project_name = var.project_name
     namespace = var.namespace
     registry = var.registry
     tenancy_name = data.oci_identity_tenancy.my_tenancy.name
@@ -445,26 +518,26 @@ data "template_file" "scheduler_template" {
     image_name = "scheduler"
     image_label = var.image_label
     nodepool_label = var.nodepool_label
+    project_name = var.project_name
   }
 }
 
-data "template_file" "deploy_scheduler" {
-  template = file("${path.module}/../../userdata/scripts/deploy_scheduler.sh")
+data "template_file" "api_server_template" {
+  template = file("${path.module}/../../userdata/templates/api-server.yaml.template")
   vars = {
     namespace = var.namespace
     registry = var.registry
     tenancy_name = data.oci_objectstorage_namespace.lookup.namespace
     repo_name = var.repo_name
-    image_name = "scheduler"
+    image_name = "api-server"
     image_label = var.image_label
-    secret_id = var.secret_id
-    registry_user = var.registry_user
-
+    nodepool_label = var.nodepool_label
+    project_name = var.project_name
   }
 }
 
 
-resource "null_resource" "deploy_scheduler" {
+resource "null_resource" "deploy_containers" {
  depends_on = [null_resource.push_to_registry, null_resource.create_db, null_resource.node_lifecycle, null_resource.generate_kubeconfig, null_resource.install_kubectl]
 
   connection {
@@ -492,22 +565,26 @@ resource "null_resource" "deploy_scheduler" {
   }  
 
   provisioner "file" {
+    content     = data.template_file.api_server_template.rendered
+    destination = "~/transcoder/build/api-server.yaml"
+  } 
+
+  provisioner "file" {
     content     = data.template_file.db_secret_template.rendered
     destination = "~/transcoder/build/db-secret.yaml"
   }  
 
-  
   provisioner "file" {
-    content     = data.template_file.deploy_scheduler.rendered
-    destination = "~/transcoder/build/deploy_scheduler.sh"
+    content     = data.template_file.deploy.rendered
+    destination = "~/transcoder/build/deploy.sh"
   }
 
 
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/build",
-      "chmod +x deploy_scheduler.sh",
-      "./deploy_scheduler.sh"
+      "chmod +x deploy.sh",
+      "./deploy.sh"
     ]
   }
 }

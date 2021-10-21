@@ -83,15 +83,15 @@ resource "oci_core_security_list" "EdgeSubnet" {
     source   = "0.0.0.0/0"
   }
   
-# ingress_security_rules {
-#   tcp_options {
-#     max = var.service_port
-#     min = var.service_port
-#   }
-#
-#    protocol = "6"
-#    source   = "0.0.0.0/0"
-#  }
+ ingress_security_rules {
+   tcp_options {
+     max = 443
+     min = 443
+   }
+
+    protocol = "6"
+    source   = "0.0.0.0/0"
+  }
 
   ingress_security_rules {
     protocol = "6"
@@ -102,7 +102,7 @@ resource "oci_core_security_list" "EdgeSubnet" {
 resource "oci_core_security_list" "PrivateSubnet" {
   count = var.useExistingVcn ? 0 : 1
   compartment_id = var.compartment_ocid
-  display_name   = "Private"
+  display_name   = "Private Subnet"
   vcn_id         = var.useExistingVcn ? var.custom_vcn[0] : oci_core_vcn.tc_vcn.0.id
 
   egress_security_rules {

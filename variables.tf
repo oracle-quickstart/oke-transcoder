@@ -171,7 +171,7 @@ variable "registry_user" {
 }
 
 variable "image_label" {
-  default = "1.0"
+  default = "1.1"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -270,16 +270,20 @@ variable "stg_server_shape" {
 # FFMPEG transcoding settings
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable project_name {
+  default = "transcode"
+}
+
 variable "ffmpeg_config" {
   type = string
   default = <<EOF
-  -map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M \n
-  -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M \n
-  -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M \n
-  -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 1 -ar 44100 \n
-  -g 48 -sc_threshold 0 -c:v libx264 \n
-  -f hls \n
-  -hls_time 5 \n 
+  -map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M 
+  -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M 
+  -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M 
+  -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 1 -ar 44100 
+  -g 48 -sc_threshold 0 -c:v libx264 
+  -f hls 
+  -hls_time 5  
   -hls_playlist_type vod 
   -hls_segment_filename stream_%v_%03d.ts
   -master_pl_name master.m3u8
@@ -296,6 +300,13 @@ variable "ffmpeg_stream_map" {
 
 variable "hls_stream_url" {
   default = ""
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Self signed SSL certificate subject
+# ---------------------------------------------------------------------------------------------------------------------
+variable "ssl_cert_subject" {
+  default = "/CN=$commonname/emailAddress=administrator@tcdemo.com"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
