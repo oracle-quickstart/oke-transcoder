@@ -89,4 +89,4 @@ else
   URL=""
 fi
 
-$SQL_CONNECT "delete from transcoded_files where name='$INPUT_FILE'; insert into transcoded_files (name, object, bucket, job_id, create_time, thumbnail, url) values ('$INPUT_FILE', '$INPUT_FILE/master.m3u8', '$OUTPUT_BUCKET', $job_id, now(), 'thumbnails/$THUMB_FILE', '$URL')"
+$SQL_CONNECT "delete from transcoded_files where name='$INPUT_FILE' and bucket='$OUTPUT_BUCKET'; insert into transcoded_files (name, object, bucket, job_id, create_time, thumbnail, url) values ('$INPUT_FILE', '$INPUT_FILE/master.m3u8', '$OUTPUT_BUCKET', $job_id, now(), 'thumbnails/$THUMB_FILE', '$URL')"
