@@ -30,8 +30,8 @@ EOF
 mysql -h ${db_ip} -D ${db_name} -u ${db_user} -p${db_password} << EOF
 create table if not exists transcoded_files(
    id INT NOT NULL AUTO_INCREMENT,
-   name VARCHAR(100) NOT NULL UNIQUE references jobs(input_file),
-   object VARCHAR(100) NOT NULL UNIQUE references jobs(transcoded_path),
+   name VARCHAR(100) NOT NULL references jobs(input_file),
+   object VARCHAR(100) NOT NULL references jobs(transcoded_path),
    bucket VARCHAR(50) NOT NULL references jobs(output_bucket),
    job_id INT NOT NULL references jobs(id),
    create_time DATETIME NOT NULL,
