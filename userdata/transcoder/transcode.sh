@@ -37,8 +37,8 @@ job_id=$($SQL_CONNECT "insert into jobs (project_id, input_file, input_bucket, o
 #res=`./ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 ../../images/big_buck_bunny_1080p_h264.mov`
 
 #Create output directories
-mkdir -p $OUTPUT_DIR
-cd $OUTPUT_DIR
+mkdir -p $OUTPUT_DIR/$INPUT_FILE
+cd $OUTPUT_DIR/$INPUT_FILE
 
 #Run ffmpeg transcoding
 echo "Transcoding file $INPUT_FILE"
@@ -59,10 +59,7 @@ ffmpeg -i $ifile -ss 00:00:14.435 -s 1280x720 -frames:v 1 $THUMB_FILE
 echo "Uploading transcoded files to $TC_DST_BUCKET OS bicket"
 #Firt check if the folder with this name already exists. If found - delete it including all objects inside the folder.
 oci os object bulk-delete --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --prefix $INPUT_FILE/ --force --auth instance_principal
-for file in *.{m3u8,ts}
-do
-   oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $file --name $INPUT_FILE/$file --force --auth instance_principal
-done
+oci os object bulk-upload --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --src-dir $OUTPUT_DIR --overwrite --auth instance_principal
 
 if [ $? -eq 0 ]; then
         echo "Successfully uploaded the transcoded files of $INPUT_FILE to OS bucket $OUTPUT_BUCKET"
@@ -72,9 +69,12 @@ else
         exit 1
 fi
 
+echo "Creating Thumbnail for $INPUT_FILE"
+ffmpeg -i $ifile -ss 00:00:14.435 -s 1280x720 -frames:v 1 $THUMB_FILE
 
 echo "Uploading thumbnail file to $TC_DST_BUCKET OS bucket"
 oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $THUMB_FILE --name thumbnails/$THUMB_FILE --force --auth instance_principal
+
 
 #Update jobs table with the job status
 echo "Updating jobs table with COMPLETED job status"
