@@ -362,7 +362,7 @@ variables:
   image_label: 
     type: string
     title: "Transcoder Image Label"
-    default: "1.1"
+    default: "1.2"
     required: true
 
   src_bucket: 
