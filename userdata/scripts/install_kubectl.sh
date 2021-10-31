@@ -6,9 +6,12 @@
 
 #sudo yum-config-manager --enable ol7_olcne
 
-sudo yum install -y kubectl git
+#sudo yum install -y kubectl git
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${cpu_arch}/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 mkdir -p ~/.kube
 
-echo "source <(kubectl completion bash)" >> ~/.bashrc
+#echo "source <(kubectl completion bash)" >> ~/.bashrc
 echo "alias k='kubectl'" >> ~/.bashrc
