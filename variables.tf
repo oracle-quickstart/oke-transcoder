@@ -93,11 +93,11 @@ variable "oke_nodepool_shape" {
 }
 
 variable "oke_node_ocpu" {
-  default = 2
+  default = 4
 }
 
 variable "oke_node_memory" {
-  default = 32
+  default = 64
 }
 
 variable "oke_nodepool_size" {

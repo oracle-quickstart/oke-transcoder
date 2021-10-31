@@ -281,7 +281,7 @@ variables:
     title: "OKE Node OCPU number"
     description: "Enter a value, minimum 1"
     min: 1
-    default: 2
+    default: 4
     visible: create_new_oke_cluster
 
   oke_node_memory:
@@ -289,7 +289,7 @@ variables:
     title: "OKE Node memory in GB"
     description: "Enter a value, minimum 16"
     min: 1
-    default: 32
+    default: 64
     visible: create_new_oke_cluster
 
   oke_namespace:
