@@ -73,7 +73,8 @@ module "stg-server" {
 #  availability_domain = data.oci_identity_availability_domain.ad.name
   availability_domain = var.availability_domain
   image_id = data.oci_core_images.oraclelinux7.images.0.id 
-  instance_shape   = var.stg_server_shape
+#  instance_shape   = var.stg_server_shape
+  instance_shape   = var.oke_nodepool_shape == "VM.Standard.A1.Flex" ? "VM.Standard.A1.Flex" : var.stg_server_shape
   instance_name = var.stg_server_name
   subnet_id =  module.network.edge-id
   ssh_public_key = var.use_remote_exec ? tls_private_key.oke_ssh_key.public_key_openssh : var.ssh_provided_public_key
@@ -97,6 +98,7 @@ module "stg-server" {
   kube_label = var.kube_label
 }
 
+
 module "transcoder" {
   count = var.use_remote_exec ? 1 : 0
   source                = "./modules/transcoder"
@@ -113,7 +115,6 @@ module "transcoder" {
   registry = var.registry
   repo_name = var.repo_name
   registry_user = var.registry_user
-  image_label = var.image_label
   secret_id = var.vault_secret_id
   namespace = var.oke_namespace
   kube_label = var.kube_label
@@ -139,4 +140,6 @@ module "transcoder" {
   ssl_cert_subject = var.ssl_cert_subject
   project_name = var.project_name
   event_rule_id = module.oci-event.event_rule_id
+  cpu_arch = var.oke_nodepool_shape == "VM.Standard.A1.Flex" ? "arm64" : "amd64"
+  image_label = var.oke_nodepool_shape == "VM.Standard.A1.Flex" ? "${var.image_label}-arm" : var.image_label
 }

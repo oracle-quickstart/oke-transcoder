@@ -39,12 +39,14 @@ data "oci_core_images" "oraclelinux7" {
   compartment_id = var.compartment_ocid
   operating_system = "Oracle Linux"
   operating_system_version = "7.9"
-  filter {
-    name = "display_name"
-    values = ["^([a-zA-z]+)-([a-zA-z]+)-([\\.0-9]+)-([\\.0-9-]+)$"]
-    regex = true
-  }
+  shape = var.oke_nodepool_shape
+#  filter {
+#    name = "display_name"
+#    values = ["^([a-zA-z]+)-([a-zA-z]+)-([\\.0-9]+)-([\\.0-9-]+)$"]
+#    regex = true
+#  }
 }
+
 
 locals { 
   bastion_subnet = var.public_edge_node ? module.network.edge-id : module.network.private-id

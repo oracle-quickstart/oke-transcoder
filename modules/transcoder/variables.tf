@@ -37,6 +37,7 @@ variable "max_worker_nodes" {}
 variable "ssl_cert_subject" {}
 variable "project_name" {}
 variable "event_rule_id" {}
+variable "cpu_arch" {}
 
 
 

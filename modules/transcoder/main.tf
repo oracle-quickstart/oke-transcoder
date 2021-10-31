@@ -79,6 +79,9 @@ resource "null_resource" "create_db" {
 
 data "template_file" "install_kubectl" {
   template = file("${path.module}/../../userdata/scripts/install_kubectl.sh")
+   vars = {
+    cpu_arch = var.cpu_arch
+  }
 }
 
 resource "null_resource" "install_kubectl" {
@@ -270,6 +273,9 @@ resource "null_resource" "build_scheduler_docker_image" {
 # Build transcoder docker image
 data "template_file" "transcoder_dockerfile" {
   template = file("${path.module}/../../userdata/transcoder/Dockerfile")
+  vars = {
+    cpu_arch = var.cpu_arch 
+  }
 }
 data "template_file" "transcode" {
   template = file("${path.module}/../../userdata/transcoder/transcode.sh")

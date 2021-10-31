@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster
 
-RUN pip install oci && pip install cx_Oracle
+RUN pip install oci
 RUN pip install kubernetes
 RUN pip install pymysql
 

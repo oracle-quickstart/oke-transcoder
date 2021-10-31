@@ -136,7 +136,7 @@ variable "cluster_autoscaling" {
 # https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm
 
 variable "oci_cluster_autoscaler_image" {
-  default = "iad.ocir.io/oracle/oci-cluster-autoscaler:1.19-2021.03"
+  default = "iad.ocir.io/oracle/oci-cluster-autoscaler:1.20.0-4"
 }
 
 variable "min_worker_nodes" {
@@ -171,7 +171,7 @@ variable "registry_user" {
 }
 
 variable "image_label" {
-  default = "1.2"
+  default = "1.3"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -262,7 +262,7 @@ variable "stg_server_name" {
 }
 
 variable "stg_server_shape" {
-  default = "VM.Standard2.1"
+  default = "VM.Standard.E3.Flex"
 }
 
 
