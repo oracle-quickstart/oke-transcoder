@@ -87,6 +87,10 @@ groupings:
 - title: "CDN Configuration"
   variables:
   - hls_stream_url
+- title: "Staging Server Configuration"
+  variables:
+  - stg_server_name
+  - stg_server_shape
 - title: "Pre-Defined"
   variables:
   - region
@@ -95,6 +99,7 @@ groupings:
   - meta_db_type
   - cluster_options_add_ons_is_kubernetes_dashboard_enabled
   - cluster_options_admission_controller_options_is_pod_security_policy_enabled
+  - ssl_cert_subject
   visible: false
 
 variables:
@@ -309,7 +314,7 @@ variables:
     type: string
     title: "Cluster Autoscaler Image"
     description: "Set this to the target region you are deploying to. For the list available OCI Cluster Autoscaler images see https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm"
-    default: "iad.ocir.io/oracle/oci-cluster-autoscaler:1.19-2021.03"
+    default: "iad.ocir.io/oracle/oci-cluster-autoscaler:1.20.0-4"
     required: true
     visible: cluster_autoscaling
 
@@ -466,7 +471,7 @@ variables:
     title: "Staging Server Instance Shape"
     dependsOn:
       compartmentId: compartment_ocid
-    default: "VM.Standard2.1"
+    default: "VM.Standard.E3.Flex"
     required: true
 
   public_edge_node:
