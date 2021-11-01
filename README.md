@@ -61,6 +61,12 @@ When configuring OKE cluster you need to define the cluster name and select the 
 ![image](https://user-images.githubusercontent.com/54962742/133625720-b040cff7-54e4-4f77-9e7d-8f5169ed2ae9.png)
 
 In OKE nodepool configuration you need to specify the nodepool name, the shape and the number of OKE nodes in the nodepool. By default it uses Kubernertes namespace 'transcode' and kube label 'transcode'. It is recommended to keep the default values for the namespace and the kube label.
+Supported OKE nodepool shapes are:
+VM.Standard.E3.Flex (AMD)
+VM.Standard.E4.Flex (AMD)
+VM.Optimized3.Flex (Intel) 
+VM.Standard.A1.Flex (ARM Ampere)
+
 
 ![image](https://user-images.githubusercontent.com/54962742/133734380-611681c2-dcf4-49b1-8df9-394eac011859.png)
 
