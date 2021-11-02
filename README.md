@@ -61,7 +61,7 @@ When configuring OKE cluster you need to define the cluster name and select the 
 ![image](https://user-images.githubusercontent.com/54962742/133625720-b040cff7-54e4-4f77-9e7d-8f5169ed2ae9.png)
 
 In OKE nodepool configuration you need to specify the nodepool name, the shape and the number of OKE nodes in the nodepool. By default it uses Kubernertes namespace 'transcode' and kube label 'transcode'. It is recommended to keep the default values for the namespace and the kube label.
-Supported OKE nodepool shapes are:
+The following OKE nodepool shapes are supported:
 
 VM.Standard.E3.Flex (AMD)
 
@@ -167,3 +167,9 @@ After the stack is successfully applied to check that the transcoder is working
   If the transcoder pod status is COMPLETED check OCI Object Storage Destination Bucket. For each transcoded file it creates a folder in the Destination Bucket with HLS manifest files (*.m3us) and segment files (*.ts)
 
   [Transcoder REST API documentation](https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.pdf) 
+  
+  To destroy RM stack and delete all resources it is recommended to delete transcoder service first. SSH to the staging server and run
+
+    kubectl -n transcode delete svc --all
+  
+  This command deletes the load balancer associated with the transcoder service. After that you can open RM stack in OCI console and destroy it.
