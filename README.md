@@ -72,7 +72,8 @@ VM.Optimized3.Flex (Intel)
 VM.Standard.A1.Flex (ARM Ampere)
 
 
-![image](https://user-images.githubusercontent.com/54962742/133734380-611681c2-dcf4-49b1-8df9-394eac011859.png)
+![Screen Shot 2021-11-01 at 5 04 55 PM](https://user-images.githubusercontent.com/54962742/139758349-01fd46cd-ad18-4e51-9e78-407c54809582.png)
+
 
 Enabling OKE Cluster Autoscaler is a part of the deployment. You need to define the autoscaler image, minimum and maxiumum number of nodes and the number of vCPU requested per a single transcoding job. 
 
