@@ -168,6 +168,7 @@ After the stack is successfully applied to check that the transcoder is working
 
   [Transcoder REST API documentation](https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.pdf) 
   
+  # Uninstall
   To destroy RM stack and delete all resources it is recommended to delete transcoder service first. SSH to the staging server and run
 
     kubectl -n transcode delete svc --all
