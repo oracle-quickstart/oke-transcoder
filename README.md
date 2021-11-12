@@ -61,8 +61,19 @@ When configuring OKE cluster you need to define the cluster name and select the 
 ![image](https://user-images.githubusercontent.com/54962742/133625720-b040cff7-54e4-4f77-9e7d-8f5169ed2ae9.png)
 
 In OKE nodepool configuration you need to specify the nodepool name, the shape and the number of OKE nodes in the nodepool. By default it uses Kubernertes namespace 'transcode' and kube label 'transcode'. It is recommended to keep the default values for the namespace and the kube label.
+The following OKE nodepool shapes are supported:
 
-![image](https://user-images.githubusercontent.com/54962742/133734380-611681c2-dcf4-49b1-8df9-394eac011859.png)
+VM.Standard.E3.Flex (AMD)
+
+VM.Standard.E4.Flex (AMD)
+
+VM.Optimized3.Flex (Intel) 
+
+VM.Standard.A1.Flex (ARM Ampere)
+
+
+![Screen Shot 2021-11-01 at 5 04 55 PM](https://user-images.githubusercontent.com/54962742/139758349-01fd46cd-ad18-4e51-9e78-407c54809582.png)
+
 
 Enabling OKE Cluster Autoscaler is a part of the deployment. You need to define the autoscaler image, minimum and maxiumum number of nodes and the number of vCPU requested per a single transcoding job. 
 
@@ -123,7 +134,7 @@ It deploys the following:
 
 Simply click the Deploy to OCI button to create an ORM stack, then walk through the menu driven deployment.  Once the stack is created, use the Terraform Actions drop-down menu to Plan, then Apply the stack.
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.2.zip)
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.3.zip)
     
 When applying the stack remote execution logging is done in terraform output directly. When the stack is successfully applied it prints SSH key and public IP address of the staging-server VM. SSH access is enabled to the staging-server VM. 
 
@@ -155,4 +166,12 @@ After the stack is successfully applied to check that the transcoder is working
     
   If the transcoder pod status is COMPLETED check OCI Object Storage Destination Bucket. For each transcoded file it creates a folder in the Destination Bucket with HLS manifest files (*.m3us) and segment files (*.ts)
 
+# REST API documentation
   [Transcoder REST API documentation](https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.pdf) 
+  
+# Uninstall
+  To destroy RM stack and delete all resources it is recommended to delete the load balancer first. SSH to the staging server and run
+
+    kubectl -n transcode delete svc --all
+  
+  This command deletes the load balancer associated with the transcoder service. After that you can open RM stack in OCI console and destroy it.
