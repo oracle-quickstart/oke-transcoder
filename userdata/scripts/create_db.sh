@@ -48,6 +48,8 @@ create table if not exists projects(
    name VARCHAR(50) NOT NULL UNIQUE,
    input_bucket VARCHAR(50) NOT NULL,
    output_bucket VARCHAR(50) NOT NULL,
+   input_bucket_PAR VARCHAR(200),
+   output_bucket_PAR VARCHAR(200),
    state VARCHAR(10) NOT NULL,
    PRIMARY KEY ( id )
 );
