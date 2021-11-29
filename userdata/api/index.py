@@ -285,10 +285,10 @@ def update_project_configuration(project_id):
     if not update_rule_response:
       db.close()
       return jsonify(error="Failed to update the event rule"), 400
-    cursor.execute("update projects set src_bucket=%s where id=%s", (data['TC_SRC_BUCKET'], project_id))
+    cursor.execute("update projects set input_bucket=%s where id=%s", (data['TC_SRC_BUCKET'], project_id))
 
   if data.get('TC_DST_BUCKET'):
-    cursor.execute("update projects set dst_bucket=%s where id=%s", (data['TC_DST_BUCKET'], project_id))
+    cursor.execute("update projects set output_bucket=%s where id=%s", (data['TC_DST_BUCKET'], project_id))
 
   db.commit()
   db.close()
