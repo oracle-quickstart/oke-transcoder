@@ -175,7 +175,7 @@ After the stack is successfully applied to check that the transcoder is working
   
   https://ip-address
   
-  During the deployment it creates and installs a self-signed certificate that will not be recognized by the browser. Click on Advanced button. MAC Users using Chrome may not be able to open it. You can configure Chrome to trust tge certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI.
+  During the deployment it creates and installs a self-signed SSL certificate that will not be recognized by the browser. In the browser window click on Advanced button. MAC users using Chrome may not be able to open it. You can configure Chrome to trust the self-signed certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI.
     
   ![image](https://user-images.githubusercontent.com/54962742/149576419-61d15e39-09c9-4d4d-a723-09f03e69e62e.png)
 
