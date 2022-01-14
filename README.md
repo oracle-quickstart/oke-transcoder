@@ -166,6 +166,20 @@ After the stack is successfully applied to check that the transcoder is working
     
   If the transcoder pod status is COMPLETED check OCI Object Storage Destination Bucket. For each transcoded file it creates a folder in the Destination Bucket with HLS manifest files (*.m3us) and segment files (*.ts)
 
+# To connect to transcoder UI
+  SSH to the staging server and run
+
+    kubectl -n transcode delete svc --all
+
+  Copy EXTERNAL-IP from the output of this command and connect to it from your web browser:
+  
+  https://<ip-address>
+  
+  During the deployment it creates and installs a self-signed certificate that will not be recognized by the browser. Click on Advanced button. MAC Users using Chrome may not be able to open it. You can configure Chrome to trust tge certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI.
+    
+  ![image](https://user-images.githubusercontent.com/54962742/149576419-61d15e39-09c9-4d4d-a723-09f03e69e62e.png)
+
+  SSL certificate can be updated on the staging server 
 # REST API documentation
   [Transcoder REST API documentation](https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.pdf) 
   
