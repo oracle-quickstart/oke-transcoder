@@ -187,9 +187,11 @@ After the stack is successfully applied to check that the transcoder is working
 
   kubectl -n transcode get pod | grep api
 
+  The last command will return the name of api-server pod. After that run
+
   kubectl -n delete pod "name of api-sever pod"
 
-  The new nginx container will be create and it will use the updated certificate
+  A new nginx container will be created and it will use the updated certificate
 
 # REST API documentation
   [Transcoder REST API documentation](https://github.com/mprestin77/oci-oke-transcoder/blob/master/Transcoder%20REST%20API%20documentation.pdf) 
