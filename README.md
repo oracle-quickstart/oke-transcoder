@@ -173,7 +173,7 @@ After the stack is successfully applied to check that the transcoder is working
 
   Copy EXTERNAL-IP from the output of this command and connect to it from your web browser:
   
-  https://<ip-address>
+  https://ip-address
   
   During the deployment it creates and installs a self-signed certificate that will not be recognized by the browser. Click on Advanced button. MAC Users using Chrome may not be able to open it. You can configure Chrome to trust tge certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI.
     
