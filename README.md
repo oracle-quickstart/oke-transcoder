@@ -15,7 +15,7 @@ Transcoder on OKE depends on use of [Instance Principals](https://docs.oracle.co
 
   instance.compartment.id = 'compartment-id'
 
-Replace the compartment-id string with your compartment ID.
+where compartment-id is the OCID of your compartment. You can get compartment OCID in OCI console from Identity & Security. Under Identity, click Compartments. A compartment hierarchy in your tenancy is displayed. Find your compartment and copy its OCID.
 
 After creating the group, you should set specific [IAM policies](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/policyreference.htm) for OCI services that can be used by the Dynamic Group. 
 
