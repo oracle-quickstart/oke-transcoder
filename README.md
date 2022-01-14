@@ -181,9 +181,13 @@ After the stack is successfully applied to check that the transcoder is working
 
   SSL certificate can be updated on the staging server. To update SSL certificate replace ssl.crt and ssl.key files in  /home/opc/transcoder/build directory and run:
   kubectl -n transcode delete configmap ssl-config
+
   kubectl -n transcode create configmap ssl-config --from-file ssl.key --from-file ssl.crt
+
   kubectl -n transcode get pod | grep api
+
   kubectl -n delete pod "name of api-sever pod"
+
   The new nginx container will be create and it will use the updated certificate
 
 # REST API documentation
