@@ -180,6 +180,7 @@ After the stack is successfully applied to check that the transcoder is working
   ![image](https://user-images.githubusercontent.com/54962742/149576419-61d15e39-09c9-4d4d-a723-09f03e69e62e.png)
 
   SSL certificate can be updated on the staging server. To update SSL certificate replace ssl.crt and ssl.key files in  /home/opc/transcoder/build directory and run:
+
   kubectl -n transcode delete configmap ssl-config
 
   kubectl -n transcode create configmap ssl-config --from-file ssl.key --from-file ssl.crt
