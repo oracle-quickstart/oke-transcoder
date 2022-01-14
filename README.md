@@ -11,9 +11,11 @@ This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on
 A media file is uploaded to the source object storage  bucket. It emits an event that creates a transcoding request in OSS streaming queue. Job scheduler container running on OKE is monitoring the queue and when a new request arrives it starts a new transcoding job running as a container on OKE. The transcoding job uses ffmpeg open source software to transcode to multiple resolutions and different bitrates. It combines the video and audio for every HLS stream, packages each combination, and create individual TS segments and the playlists. On completion it creates a master manifest file, uploads all the files to the destination bucket and updates MySQL database with the playlist. Users can configure and monitor the status of transcoding jobs and view transcoded files in a web-based User Interface or by using REST API.   
 
 # Pre-Requisites
-Transcoder on OKE depends on use of [Instance Principals](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for container execution.  You should create a [dynamic group](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm) for the compartment where you are deploying your OKE cluster. The Dynamic Group must match either all compute instancers in the compartment or compute instances that have a certain tag. In this example, I am using a [Default Tag](https://docs.oracle.com/en-us/iaas/Content/Tagging/Tasks/managingtagdefaults.htm) for all resources in the target compartment to define the Dynamic Group:
+Transcoder on OKE depends on use of [Instance Principals](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm) for container execution.  You should create a [dynamic group](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm) for the compartment where you are deploying your OKE cluster. When creating a dynamic group to match all compute instances in the compartment you can use the following matching rule:
 
-tag.DynamicGroup.InstancePrincipal.value='Enabled'
+  instance.compartment.id = 'compartment-id'
+
+Replace the compartment-id string with your compartment ID.
 
 After creating the group, you should set specific [IAM policies](https://docs.oracle.com/en-us/iaas/Content/Identity/Reference/policyreference.htm) for OCI services that can be used by the Dynamic Group. 
 
