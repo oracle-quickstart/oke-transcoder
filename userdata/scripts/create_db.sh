@@ -3,7 +3,7 @@
 
 # Install MySQL client
 sudo yum install -y https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
-rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
 sudo yum install -y mysql
 
 # Connect to MySQL instance and create transcoding database and user
