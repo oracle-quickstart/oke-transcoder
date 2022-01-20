@@ -48,7 +48,7 @@ if [ $? -eq 0 ]; then
         echo "Successfully transcoded $INPUT_FILE"
 else
         echo "Failed to transcode $INPUT_FILE"
-        $SQL_CONNECT "update jobs set status='ERROR' where job_id=$job_id"
+        $SQL_CONNECT "update jobs set status='ERROR' where id=$job_id"
         exit 1
 fi
 
