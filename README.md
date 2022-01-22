@@ -4,7 +4,7 @@ This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on
 
 # Data Flow
 
-![image](https://user-images.githubusercontent.com/54962742/148877887-fe1e4432-ac2b-42af-b35e-e78b73ffb36f.png)
+![image](https://user-images.githubusercontent.com/54962742/150646075-1042c795-deb3-4b1c-903d-4d06962d4a61.png)
 
 
 
