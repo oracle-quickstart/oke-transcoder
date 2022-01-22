@@ -88,6 +88,10 @@ Media files to be transcoded are uploaded to OCI Object Storage Source Bucket. T
 
 ![image](https://user-images.githubusercontent.com/54962742/133596330-1818ef4a-94c1-4e00-b57d-53a96fd43c93.png)
 
+When creating the Source Bucket make sure that you check "Emit Object Events" checkbox: 
+
+![image](https://user-images.githubusercontent.com/54962742/150646300-3c847d4c-f075-4e18-b8fc-86e5b18700b7.png)
+
 When configuring MySQL parameters specify password for both the mysql admin and transcoder database user accounts.
 
 ![image](https://user-images.githubusercontent.com/54962742/133627784-19f8afcb-9bfa-4e4b-9c76-01bd9777d600.png)
