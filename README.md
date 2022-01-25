@@ -187,7 +187,7 @@ After the stack is successfully applied to check that the transcoder is working
 
   Login with the admin user credentials and you'll be redirected to the dashboard page:
     
-  ![image](https://user-images.githubusercontent.com/54962742/150896418-ae839408-8666-4c3b-b790-984a64b26a54.png)
+  ![image](https://user-images.githubusercontent.com/54962742/150897094-111a3d88-2900-4098-89ee-23c361b2de4a.png)
 
   SSL certificate can be updated on the staging server. To update SSL certificate replace ssl.crt and ssl.key files in  /home/opc/transcoder/build directory and run:
 
