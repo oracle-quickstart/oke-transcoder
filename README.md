@@ -185,9 +185,9 @@ After the stack is successfully applied to check that the transcoder is working
   
   ![image](https://user-images.githubusercontent.com/54962742/150895519-f407b6f1-c1c2-406b-b376-d4070dd9900b.png)
 
-  Login with the admin user credentials and you'll be redirected to "Welcome to OKE Transcoding Deployment" page
+  Login with the admin user credentials and you'll be redirected to the dashboard page:
     
-  ![image](https://user-images.githubusercontent.com/54962742/150896347-188d0ee1-5ce5-43d1-8c18-a913f61f97be.png)
+  ![image](https://user-images.githubusercontent.com/54962742/150896418-ae839408-8666-4c3b-b790-984a64b26a54.png)
 
   SSL certificate can be updated on the staging server. To update SSL certificate replace ssl.crt and ssl.key files in  /home/opc/transcoder/build directory and run:
 
