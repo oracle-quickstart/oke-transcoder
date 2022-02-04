@@ -4,7 +4,7 @@ This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on
 
 # Data Flow
 
-![image](https://user-images.githubusercontent.com/54962742/148877887-fe1e4432-ac2b-42af-b35e-e78b73ffb36f.png)
+![image](https://user-images.githubusercontent.com/54962742/150646075-1042c795-deb3-4b1c-903d-4d06962d4a61.png)
 
 
 
@@ -88,6 +88,10 @@ Media files to be transcoded are uploaded to OCI Object Storage Source Bucket. T
 
 ![image](https://user-images.githubusercontent.com/54962742/133596330-1818ef4a-94c1-4e00-b57d-53a96fd43c93.png)
 
+When creating the Source Bucket in OCI Object Storage make sure that you check "Emit Object Events" checkbox: 
+
+![image](https://user-images.githubusercontent.com/54962742/150646663-76af74c7-a9a0-48f6-8beb-0a0da7535648.png)
+
 When configuring MySQL parameters specify password for both the mysql admin and transcoder database user accounts.
 
 ![image](https://user-images.githubusercontent.com/54962742/133627784-19f8afcb-9bfa-4e4b-9c76-01bd9777d600.png)
@@ -136,7 +140,7 @@ It deploys the following:
 
 Simply click the Deploy to OCI button to create an ORM stack, then walk through the menu driven deployment.  Once the stack is created, use the Terraform Actions drop-down menu to Plan, then Apply the stack.
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.4.zip)
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.5.zip)
     
 When applying the stack remote execution logging is done in terraform output directly. When the stack is successfully applied it prints SSH key and public IP address of the staging-server VM. SSH access is enabled to the staging-server VM. 
 
@@ -177,9 +181,13 @@ After the stack is successfully applied to check that the transcoder is working
   
   https://ip-address
   
-  During the deployment it creates and installs a self-signed SSL certificate that will not be recognized by the browser. In the browser window click on Advanced button. MAC users using Chrome may not be able to open it. You can configure Chrome to trust the self-signed certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI.
+  During the deployment it creates and installs a self-signed SSL certificate that will not be recognized by the browser. In the browser window click on Advanced button. MAC users using Chrome may not be able to open it. You can configure Chrome to trust the self-signed certificate or just type 'thisisunsafe' in Chrome window. After that it should open the Transcoder UI login page:
+  
+  ![image](https://user-images.githubusercontent.com/54962742/150895519-f407b6f1-c1c2-406b-b376-d4070dd9900b.png)
+
+  Login with the admin user credentials and you'll be redirected to the dashboard page:
     
-  ![image](https://user-images.githubusercontent.com/54962742/149576419-61d15e39-09c9-4d4d-a723-09f03e69e62e.png)
+  ![image](https://user-images.githubusercontent.com/54962742/150897094-111a3d88-2900-4098-89ee-23c361b2de4a.png)
 
   SSL certificate can be updated on the staging server. To update SSL certificate replace ssl.crt and ssl.key files in  /home/opc/transcoder/build directory and run:
 
