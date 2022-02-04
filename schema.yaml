@@ -79,11 +79,14 @@ groupings:
   - bastion_name
   - bastion_shape
   - edgeSubnet
+- title: "User Configuration"
+  variables:
+  - admin_tc_user
+  - admin_tc_password
 - title: "Transcoding Configuration"
   variables:
   - project_name
   - ffmpeg_config
-  - ffmpeg_stream_map
 - title: "CDN Configuration"
   variables:
   - hls_stream_url
@@ -367,7 +370,7 @@ variables:
   image_label: 
     type: string
     title: "Transcoder Image Label"
-    default: "1.4"
+    default: "1.6"
     required: true
 
   src_bucket: 
@@ -423,7 +426,7 @@ variables:
   mysql_admin_password:
     type: password
     title: "OCI MySQL password"
-    description: "The password for the administrative user. The password must be between 8 and 32 characters long, and must contain at least 1 numeric character, 1 lowercase character, 1 uppercase character, and 1 special (nonalphanumeric) character."
+    description: "The password for MySQL administrative user. The password must be between 8 and 32 characters long, and must contain at least 1 numeric character, 1 lowercase character, 1 uppercase character, and 1 special (nonalphanumeric) character."
     required: true
 
   mysql_shape:
@@ -482,6 +485,19 @@ variables:
     visible:
       not:
         - use_remote_exec
+      
+  admin_tc_user:
+    type: string
+    title: "Transcoder UI Admin Username"
+    description: "Enter a username (email) for Transcoder UI admin user"
+    default: "admin@tcdemo.com"
+    required: true
+
+  admin_tc_password:
+    type: password
+    title: "Transcoder UI Admin's password"
+    description: "The password must be between 8 and 32 characters long, and must contain at least 1 numeric character, 1 lowercase character, 1 uppercase character, and 1 special (nonalphanumeric) character"
+    required: true
 
   project_name:
     type: string
@@ -491,11 +507,6 @@ variables:
   ffmpeg_config:
     type: string
     title: "FFMPEG Configuration"
-    required: true
-
-  ffmpeg_stream_map:
-    type: string
-    title: "FFMPEG Stream Map"
     required: true
   
   hls_stream_url:

@@ -1,0 +1,34 @@
+/*@media screen and (max-width: 576px) {
+  #btnsRow{
+      padding-left: 5%;
+      padding-right: 5%;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  #vs-pills-tab, #compute-vs-pills-tab{
+      display: none;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  #v-pills-tab, #compute-v-pills-tab{
+      display: none;
+  }
+}*/
+
+@media screen and (min-width: 1000px) {
+    #advanced_small{
+      display: none;
+    }
+    
+  }
+  
+  @media screen and (max-width: 1000px) {
+    #advanced_small{
+      display: inline;
+    }
+    #advanced_large{
+      display: none;
+    }
+  }

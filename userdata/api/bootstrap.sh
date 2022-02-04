@@ -1,3 +1,3 @@
 #!/bin/sh
 export FLASK_APP=./index.py
-flask run -h 0.0.0.0 --cert=cert.pem --key=key.pem
+uwsgi --socket 0.0.0.0:5000 --buffer-size=32768 --wsgi-file index.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191

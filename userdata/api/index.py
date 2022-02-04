@@ -1,5 +1,6 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_httpauth import HTTPBasicAuth
+import functools
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from kubernetes import client, config
@@ -9,6 +10,8 @@ import pymysql
 import json
 import pytz
 import os
+import re
+import secrets
 import oci
 from oci.object_storage.models import CreateBucketDetails
 from oci.object_storage.models import CreatePreauthenticatedRequestDetails
@@ -24,14 +27,77 @@ CORS(app)
 auth = HTTPBasicAuth()
 
 users = {
-    "RestApiUser": generate_password_hash("Tr@nsc0de!"),
+    "RestApiUser": generate_password_hash("Tr@nsc0de!", method='sha256'),
 }
+
+app.secret_key = 'Tr@nsc0de!'
 
 @auth.verify_password
 def verify_password(username, password):
     if username in users and \
             check_password_hash(users.get(username), password):
         return username
+
+def is_authorized(function):
+    @functools.wraps(function)
+    def wrapper(*a, **kw):
+
+###        session_id = request.headers.get('Sessionid')
+        
+        # Check if this is an existing session
+        if 'loggedin' in session:
+          print("authorization succeeded - joining an existing session")
+          return function(*a, **kw)
+        
+        # Authenticate using basic authentication
+        auth = request.authorization
+        if not auth:
+          return jsonify(authentication_error='Unauthorized'), 401
+
+        username = auth.get('username')
+        password = auth.get('password')
+        
+        if not username or not password:
+          return jsonify(authentication_error='Unauthorized'), 401
+        
+        if username in users and check_password_hash(users.get(username), password):   
+          print("authorization succeeded using basic authentication")
+          return function(*a, **kw)
+        else:
+          return jsonify(authentication_error='Unauthorized'), 401
+
+    return wrapper
+
+def is_admin_authorized(function):
+    @functools.wraps(function)
+    def wrapper(*a, **kw):
+        
+        # Check if this is an existing admin session
+        if 'loggedin' in session and 'admin' in session:
+          return function(*a, **kw)
+#        else:
+#          return jsonify(authentication_error='Unauthorized'), 401
+
+        # Authenticate using basic authentication
+        auth = request.authorization
+        if not auth:
+          return jsonify(authentication_error='Unauthorized'), 401
+
+        username = auth.get('username')
+        password = auth.get('password')
+        
+        if not username or not password:
+          return jsonify(authentication_error='Unauthorized'), 401
+        
+        if username in users and check_password_hash(users.get(username), password):   
+          print("authorization succeeded using basic authentication")
+          return function(*a, **kw)
+        else:
+          return jsonify(authentication_error='Unauthorized'), 401
+
+    return wrapper
+
+
 
 def connect_db():
   # Open database connection
@@ -43,8 +109,12 @@ def connect_db():
 
 # Get jobs info
 @app.route('/api/v1/projects/<project_id>/jobs')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_jobs(project_id):
+
+  print("in get_jobs")
+  print(request.headers)
 
   db = connect_db()
 
@@ -72,7 +142,8 @@ def get_jobs(project_id):
 
 # Get job info
 @app.route('/api/v1/jobs/<job_id>')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_job(job_id):
   # Open database connection
   db = connect_db()
@@ -84,7 +155,7 @@ def get_job(job_id):
   cursor.execute("SELECT * from jobs where id=%s",(job_id))
 
   row_headers=[x[0] for x in cursor.description] #this will extract row headers
-  # Fetch all rows 
+  # Fetch one row 
   rv = cursor.fetchone()
   
   if rv:
@@ -100,7 +171,8 @@ def get_job(job_id):
 
 # Get a list of transcoded files 
 @app.route('/api/v1/projects/<project_id>/objects')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_objects(project_id):
   # Open database connection
   db = connect_db()
@@ -128,7 +200,8 @@ def get_objects(project_id):
 
 # Get a list of transcoded files in OS bucket 
 @app.route('/api/v1/objects')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_objects_in_bucket():
 
   data = request.get_json()
@@ -162,7 +235,8 @@ def get_objects_in_bucket():
   return jsonify(data=json_data), 200
 
 @app.route('/api/v1/projects')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_projects():
   # Open database connection
   db = connect_db()
@@ -186,7 +260,8 @@ def get_projects():
   return jsonify(data=json_data), 200
 
 @app.route('/api/v1/projects/<project_id>')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_project(project_id):
   # Open database connection
   db = connect_db()
@@ -209,7 +284,8 @@ def get_project(project_id):
   return jsonify(data=json_data), 200
 
 @app.route('/api/v1/projects/<project_id>/configuration')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_project_configuration(project_id):
   
   # Open database connection
@@ -243,7 +319,8 @@ def get_project_configuration(project_id):
 
 
 @app.route('/api/v1/projects/<project_id>/configuration', methods=['PUT'])
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def update_project_configuration(project_id):
 
   data = request.get_json()
@@ -297,7 +374,8 @@ def update_project_configuration(project_id):
 
 
 @app.route('/api/v1/projects', methods=['POST'])
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def add_project():
 
   data = request.get_json()
@@ -346,8 +424,8 @@ def add_project():
   if not data.get('TC_FFMPEG_CONFIG'): 
     data['TC_FFMPEG_CONFIG'] = os.environ['TC_FFMPEG_CONFIG']
 
-  if not data.get('TC_FFMPEG_STREAM_MAP'): 
-    data['TC_FFMPEG_STREAM_MAP'] = os.environ['TC_FFMPEG_STREAM_MAP']
+#  if not data.get('TC_FFMPEG_STREAM_MAP'): 
+#    data['TC_FFMPEG_STREAM_MAP'] = os.environ['TC_FFMPEG_STREAM_MAP']
 
   if not data.get('TC_FFMPEG_HLS_BASE_URL'): 
     data['TC_FFMPEG_HLS_BASE_URL'] = os.environ['TC_FFMPEG_HLS_BASE_URL']
@@ -363,7 +441,7 @@ def add_project():
   cursor.execute("SELECT * from projects where name=%s", (name))
 
   row_headers=[x[0] for x in cursor.description] #this will extract row headers
-  # Fetch all rows 
+
   rv = cursor.fetchone()
   
   if rv:
@@ -404,7 +482,7 @@ def add_project():
   cursor.execute("insert into projects (name, input_bucket, output_bucket, input_bucket_par, output_bucket_par, state) values (%s,%s,%s,%s,%s,%s)", (name, input_bucket, output_bucket, ipar, opar, 'active'))
   cursor.execute("select * from projects where name=%s", (name))
   row_headers=[x[0] for x in cursor.description] #this will extract row headers
-  # Fetch all rows 
+
   rv = cursor.fetchone()
   json_data={}
   if rv:
@@ -416,7 +494,8 @@ def add_project():
   return jsonify(data=json_data), 200
   
 @app.route('/api/v1/projects/<project_id>', methods=['PUT'])
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def update_project(project_id):
 
   data = request.get_json()
@@ -557,7 +636,8 @@ def add_bucket_to_event_rule(bucket, event_rule_id):
       return None
 
 @app.route('/api/v1/statistics')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def statistics():
 
     db = connect_db()
@@ -580,7 +660,7 @@ def statistics():
     # Get number of transcoded files
     cursor.execute("select count(*) count from transcoded_files;")
     row_headers=[x[0] for x in cursor.description] #this will extract row headers
-    # Fetch all rows 
+ 
     rv = cursor.fetchone()
     number_of_files = rv[0]
 
@@ -590,7 +670,8 @@ def statistics():
     return jsonify(data=json_data), 200
 
 @app.route('/api/v1/list_buckets')
-@auth.login_required
+#@auth.login_required
+@is_authorized
 def get_list_of_buckets():
     data = request.get_json()
     if not data:
@@ -615,8 +696,293 @@ def get_list_of_buckets():
       print("Exception when calling object_storage_client api: %s\n" % e)
       return None
 
+@app.route('/api/v1/register', methods=['POST'])
+def register():
+  data = request.get_json()
+  
+  if data.get('email'):
+    email = data['email']
+    if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            return jsonify(error="failed to add user: Invalid email address!"), 400
+  
+  if data.get('name'):
+    name = data['name']
+  
+  if data.get('password'):
+    password = generate_password_hash(data['password'], method='sha256')  
+
+  if not email or not name or not password:
+    return jsonify(error="failed to add user: user email, name and password must be set in request body"), 400    
+  
+  is_admin = False 
+
+  # add the new user to the database
+  db = connect_db()
+  cursor = db.cursor()
+
+  # check if a user with this email already exists
+  cursor.execute("select * from users where email=%s", (email))
+  rv = cursor.fetchone()
+  if rv:
+    db.close()
+    return jsonify(error="failed to add user: a user with this email already exists"), 400  
+
+  api_key = secrets.token_hex(16) 
+
+  cursor.execute("insert into users (email, name, password, is_admin, api_key, status) values (%s,%s,%s,%s,%s,%s)", (email, name, password, is_admin, api_key, "pending"))
+  cursor.execute("select * from users where email=%s", (email))
+  row_headers=[x[0] for x in cursor.description]
+  rv = cursor.fetchone()
+  if rv:
+    # Combine column name and value in JSON format
+    user = dict(zip(row_headers,rv))
+  # Commit changes and disconnect from server
+    db.commit()
+    db.close()
+    return jsonify(data=user), 200
+  else:
+    db.close()
+    return jsonify(error="failed to add user"), 400    
+
+
+@app.route('/api/v1/login', methods=['GET', 'POST'])
+def login():
+  data = request.get_json()
+  
+  if data.get('email'):
+    email = data['email']
+  
+  if data.get('password'):
+    password = data['password']
+
+  if not email or not password:
+    return jsonify(error="failed to autheiticate user: user email and password must be set in request body"), 400  
+
+  db = connect_db()
+  cursor = db.cursor()
+  cursor.execute("select * from users where email=%s", (email))
+  row_headers=[x[0] for x in cursor.description]
+  rv = cursor.fetchone()
+  if rv:
+    # Combine column name and value in JSON format
+    user = dict(zip(row_headers,rv))
+    #Check that the user is active
+    if user['status'] != "active":
+      return jsonify(error="failed to authenticate user: the user is not active"), 401
+    #Check user password 
+    if check_password_hash(user['password'] , password):
+      session['loggedin'] = True
+      session['id'] = user['id'] 
+      session['username'] = user['email']
+      is_admin = user.get('is_admin')
+      if is_admin:
+        session['admin'] = True
+      else:
+        session['admin'] = False
+      db.close()
+      return jsonify(data={'username':user['email'], 'name':user['name']}, message="Logged on successfully!"), 200
+    else:
+      db.close()
+      return jsonify(error="failed to authenticate user: incorrect password"), 401
+    # if the above check passes, then we know the user has the right credentials
+  else:
+    db.close()
+    return jsonify(error="failed to authenticate user: invalid username"), 401   
+
+
+@app.route('/api/v1/logout')
+@is_authorized
+def logout():
+    # Remove session data, this will log the user out
+   username = session['username']
+   session.pop('loggedin', None)
+   session.pop('id', None)
+   session.pop('username', None)
+   # Redirect to login page
+   return jsonify(data={'username':username},message="Logged out successfully!"), 200
+
+@app.route('/api/v1/update_password', methods=['PUT'])
+@is_authorized
+def update_password():
+  data = request.get_json()
+  
+  email = session['username']
+  password = data.get('password')
+  new_password = data.get('new_password')
+
+  if not email:
+    return jsonify(error="failed to reset: Not Authorized")
+
+  if not password or not new_password:
+    return jsonify(error="failed to reset password: user old password and new passwords must be set in request body"), 400  
+
+  db = connect_db()
+  cursor = db.cursor()
+  cursor.execute("select * from users where email=%s", (email))
+  row_headers=[x[0] for x in cursor.description]
+  rv = cursor.fetchone()
+
+  if rv:
+    # Combine column name and value in JSON format
+    user = dict(zip(row_headers,rv))
+    if not check_password_hash(user['password'] , password):
+      db.close()
+      return jsonify(error="failed to change password: incorrect password"), 401
+    elif new_password == password:
+      db.close()
+      return jsonify(error="failed to change password: new and old passwords are identical"), 400
+    else:     
+      password = generate_password_hash(new_password, method='sha256') 
+      cursor.execute("update users set password=%s where email=%s", (password,email))
+      db.commit() 
+      db.close()
+      return jsonify(data={}), 200
+  else:
+    db.close()
+    return jsonify(error="failed to change password: user not found"), 400   
+
+@app.route('/api/v1/reset_password', methods=['POST'])
+#@is_authorized
+def reset_password():
+  data = request.get_json()
+  
+  email = data.get('email')
+
+  api_key = data.get('api_key')
+
+  password = data.get('password')
+
+  if not email or not api_key or not password:
+    return jsonify(error="failed to reset password: user email, api_key and the new password must be set in request body"), 400  
+
+  db = connect_db()
+  cursor = db.cursor()
+  cursor.execute("select * from users where email=%s", (email))
+  row_headers=[x[0] for x in cursor.description]
+  rv = cursor.fetchone()
+
+  if rv:
+    # Combine column name and value in JSON format
+    json_data = dict(zip(row_headers,rv))
+    if api_key != json_data['api_key']:
+      db.close()
+      return jsonify(error="failed to reset password: incorrect api_key")
+    password = generate_password_hash(data['password'], method='sha256') 
+    cursor.execute("update users set password=%s where email=%s", (password,email))
+    db.commit() 
+    db.close()
+    return jsonify(data={}), 200
+  else:
+    db.close()
+    return jsonify(error="failed to reset password: invalid username"), 400   
+
+@app.route('/api/v1/update_user', methods=['PUT'])
+#@auth.login_required
+@is_admin_authorized
+def update_user():
+  data = request.get_json()
+  
+  if data.get('email'):
+    email = data['email']
+  else:
+    return jsonify(error="failed to update user: user email must be set in request body"), 400    
+
+  db = connect_db()
+  cursor = db.cursor()
+
+  # check if a user with this email exists
+  cursor.execute("select * from users where email=%s", (email))
+  rv = cursor.fetchone()
+  if not rv:
+    db.close()
+    return jsonify(error="failed to delete user: the user does not exists"), 400    
+  
+  if data.get('name'):
+    name = data['name']
+    cursor.execute("update users set name=%s where email=%s", (name, email))
+
+  if data.get('status'):
+    status = data['status'].lower()
+    if status == "active" or status == "inactive" or status == "pending":
+      cursor.execute("update users set status=%s where email=%s", (status, email))
+    else:
+      return jsonify(error="failed to update user: status is not set correctly in request body"), 400    
+
+  if data.get('is_admin') != None:
+    if data['is_admin'] == True:
+      cursor.execute("update users set is_admin=%s where email=%s", (True, email))
+    elif data['is_admin'] == False:
+      cursor.execute("update users set is_admin=%s where email=%s", (False, email))
+    else:
+      return jsonify(error="failed to update user: is_admin is not set correctly in request body"), 400    
+  
+  db.commit()
+  db.close()
+  
+  return jsonify(data={}), 200
+
+
+@app.route('/api/v1/users/<string:status>')
+@is_admin_authorized
+def get_users(status):
+ 
+  if status == '*':
+    user_status = None
+  elif status.lower() in ("active", "inactive", "pending"):
+    user_status = status.lower()
+  else:
+    return jsonify(error="failed to get users: incorrect user status"), 400
+  
+  db = connect_db()
+  cursor = db.cursor()
+
+  if user_status:
+    cursor.execute("select * from users where status=%s",(user_status))
+  else:
+    cursor.execute("select * from users")
+
+  row_headers=[x[0] for x in cursor.description] #this will extract row headers
+  # Fetch all rows 
+  rv = cursor.fetchall()
+  users=[]
+  # Combine column name and value in JSON format
+  if rv:
+    for result in rv:
+        user = dict(zip(row_headers,result))
+        users.append({'id':user['id'],'email':user['email'],'name':user['name'],'is_admin':user['is_admin'],'status':user['status'],'api_key':user['api_key']})
+  # disconnect from server
+  db.close()
+  return jsonify(data=users), 200
+
+
+@app.route('/api/v1/users/id/<int:user_id>')
+@is_admin_authorized
+def get_user(user_id):
+  db = connect_db()
+  cursor = db.cursor()
+  cursor.execute("SELECT * from users where id=%s",(user_id))
+
+  row_headers=[x[0] for x in cursor.description] #this will extract row headers
+  # Fetch one rows 
+  rv = cursor.fetchone()
+  
+  if rv:
+    # Combine column name and value in JSON format
+    user = dict(zip(row_headers,rv))
+    db.close()
+    return jsonify(data={'id':user['id'],'email':user['email'],'name':user['name'],'is_admin':user['is_admin'],'status':user['status'],'api_key':user['api_key']}), 200
+  else:
+    db.close()
+    return jsonify(error="Invalid user ID"), 400
+
+@app.route('/api/v1/users/identity')
+@is_authorized
+def get_user_identity():
+ 
+  if 'loggedin' in session:
+    return jsonify(data={'username':session['username'], 'is_admin':session['admin']}), 200
+
 
 
 if __name__ == '__main__':
    app.run(debug=True)
-

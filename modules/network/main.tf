@@ -82,8 +82,18 @@ resource "oci_core_security_list" "EdgeSubnet" {
     protocol = "6"
     source   = "0.0.0.0/0"
   }
-  
- ingress_security_rules {
+ 
+  ingress_security_rules {
+   tcp_options {
+     max = 80
+     min = 80
+   }
+
+    protocol = "6"
+    source   = "0.0.0.0/0"
+  }
+
+  ingress_security_rules {
    tcp_options {
      max = 443
      min = 443

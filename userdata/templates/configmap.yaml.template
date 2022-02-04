@@ -18,5 +18,4 @@ data:
   TC_DB_USER: "${db_user}"
   TC_CPU_REQUEST_PER_JOB: "${cpu_request_per_job}"
   TC_FFMPEG_CONFIG: "${ffmpeg_config}"
-  TC_FFMPEG_STREAM_MAP: "${ffmpeg_stream_map}" 
   TC_FFMPEG_HLS_BASE_URL: "${hls_stream_url}"

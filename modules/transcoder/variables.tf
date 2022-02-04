@@ -27,7 +27,6 @@ variable "dst_bucket" {}
 variable "stream_ocid" {}
 variable "stream_endpoint" {}
 variable "ffmpeg_config" {}
-variable "ffmpeg_stream_map" {}
 variable "hls_stream_url" {}
 variable "cpu_request_per_job" {}
 variable "cluster_autoscaling" {}
@@ -38,6 +37,8 @@ variable "ssl_cert_subject" {}
 variable "project_name" {}
 variable "event_rule_id" {}
 variable "cpu_arch" {}
+variable "admin_tc_user" {}
+variable "admin_tc_password" {}
 
 
 

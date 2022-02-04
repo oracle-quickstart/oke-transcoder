@@ -40,6 +40,33 @@ job_id=$($SQL_CONNECT "insert into jobs (project_id, input_file, input_bucket, o
 mkdir -p $OUTPUT_DIR/$INPUT_FILE
 cd $OUTPUT_DIR/$INPUT_FILE
 
+#Check duration of the video stream
+video_duration=$(ffprobe -v error -of flat=s_ -select_streams v -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 $ifile)
+
+#Check if there is an audio stream
+audio_duration=$(ffprobe -v error -of flat=s_ -select_streams a -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 $ifile)
+
+number_of_video_streams=$(echo $TC_FFMPEG_CONFIG | egrep -o "\-map +v" | wc -l)
+
+# Set FFMPEG Stream Map 
+# v:0,a:0 v:1,a:1 ... (if there are both video and audio streams) 
+# v:0 v:1 ... (if there are only video streams)
+
+TC_FFMPEG_STREAM_MAP=""
+
+if [ "$audio_duration" ]; then
+    for ((i=0;i<$number_of_video_streams;i++)) 
+    do   
+        TC_FFMPEG_STREAM_MAP="$TC_FFMPEG_STREAM_MAP v:$i,a:$i"
+    done
+else
+    echo "No audio stream"
+    for ((i=0;i<$number_of_video_streams;i++)) 
+    do   
+        TC_FFMPEG_STREAM_MAP="$TC_FFMPEG_STREAM_MAP v:$i"
+    done   
+fi
+
 #Run ffmpeg transcoding
 echo "Transcoding file $INPUT_FILE"
 ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "$TC_FFMPEG_STREAM_MAP" stream_%v.m3u8
@@ -48,12 +75,9 @@ if [ $? -eq 0 ]; then
         echo "Successfully transcoded $INPUT_FILE"
 else
         echo "Failed to transcode $INPUT_FILE"
-        $SQL_CONNECT "update jobs set status='ERROR' where job_id=$job_id"
+        $SQL_CONNECT "update jobs set status='ERROR' where id=$job_id"
         exit 1
 fi
-
-echo "Creating Thumbnail for $INPUT_FILE"
-ffmpeg -i $ifile -ss 00:00:14.435 -s 1280x720 -frames:v 1 $THUMB_FILE
 
 #Upload the transcoded files to OCI object storage bucket
 echo "Uploading transcoded files to $TC_DST_BUCKET OS bicket"
@@ -69,8 +93,12 @@ else
         exit 1
 fi
 
-echo "Creating Thumbnail for $INPUT_FILE"
-ffmpeg -i $ifile -ss 00:00:14.435 -s 1280x720 -frames:v 1 $THUMB_FILE
+# Set thumbnail duration to 10 sec. If video duration is less than 10 sec set thumbnail duration to video duration
+if (( $(echo "$video_duration > 10" |bc -l) )); then
+    ffmpeg -i $ifile -ss 00:00:10 -s 1280x720 -frames:v 1 $THUMB_FILE
+else
+    ffmpeg -i $ifile -s 1280x720 -frames:v 1 $THUMB_FILE
+fi
 
 echo "Uploading thumbnail file to $TC_DST_BUCKET OS bucket"
 oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file $THUMB_FILE --name thumbnails/$THUMB_FILE --force --auth instance_principal

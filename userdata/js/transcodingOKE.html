@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Transcoding on OKE</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/transcodingOKE.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/create.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.0.10/hls.js"></script>
+</head>
+
+<body>
+    <div id="navbarNav">
+        <nav class="navbar fixed-top navbar-dark navbar-expand-md bg-white portfolio-navbar gradient" style="filter: sepia(100%);">
+            <div class="container-fluid">
+                <a class="navbar-brand logo" href="#"
+              style="color: var(--bs-gray-900);filter: sepia(0%);">Transcoding on Oracle Kubernetes Engine</a><button
+                data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navbarNav"><span
+                    class="visually-hidden">Toggle
+                    navigation</span><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="modal" data-bs-target="#new_project_modal" style="cursor:pointer; color: var(--bs-gray-900);">New Project</a></li>
+                        <li v-if="is_admin" class="nav-item" v-on:click="get_requests('pending')">
+                            <span v-show="pending_requests > 0" class="badge badge-pill badge-primary" style="color:black;float:left;margin-left: 1em;margin-bottom: -0.5em;">{{pending_requests}}</span>
+                            <a class="nav-link active" data-bs-toggle="modal" data-bs-target="#users_modal" style="cursor:pointer; color: var(--bs-gray-900);">
+                                <i class="fas fa-bell"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor:pointer; color: var(--bs-gray-900);">
+                              <i class="fas fa-user"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <a v-on:click="logout()" class="dropdown-item" href="#">Logout</a>
+                                <a class="dropdown-item" href="#"   data-bs-toggle="modal"
+                                data-bs-target="#change_password_modal">Change Password</a>
+                                <a v-if="is_admin" v-on:click="get_requests('*');" class="dropdown-item" href="#"   data-bs-toggle="modal"
+                                data-bs-target="#all_users_modal">List of Users</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+        </div>
+        </nav>
+        <div id="all_users_modal" class="modal fadeIn" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">All Users</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                                <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox21" v-model="all_users_filter_status[0]">
+                                <label class="form-check-label" for="inlineCheckbox21">Active</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox22"  v-model="all_users_filter_status[1]">
+                                <label class="form-check-label" for="inlineCheckbox22">Inactive</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox23"  v-model="all_users_filter_status[2]">
+                                <label class="form-check-label" for="inlineCheckbox23">Pending</label>
+                            </div>
+                        </div>
+                        <div v-for="user in filtered_users" class="card mb-3" style="width: 100%;">
+                            <div class="card-body">
+                                <span v-if="user.status != 'pending'" style="float: right;">{{user.status}}</span>
+                                <h5 class="card-title">{{user.name}} <span class="ms-2" v-if="user.is_admin">(Administrator)</span></h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{user.email}}</h6>
+                                <p class="card-text">Apikey: {{user.api_key}}</p>
+                                <div v-if="user.email != email">
+                                    <div v-if="user.status == 'pending'">
+                                        <button type="button" v-on:click="change_user(user, 'active', false);" class="btn btn-outline-success"><i class="fas fa-check"></i>&nbsp;&nbsp;Approve</button>
+                                        <button type="button" v-on:click="change_user(user, 'active', true);" class="btn btn-outline-dark mx-3"><i class="fas fa-check"></i>&nbsp;&nbsp;Make Admin</button>
+                                        <button type="button" v-on:click="change_user(user, 'inactive', false);" class="btn btn-outline-danger"><i class="fas fa-times"></i>&nbsp;&nbsp;Reject</button>
+                                    </div>
+                                    <div v-else-if="user.status == 'inactive'">
+                                        <button type="button" v-on:click="change_user(user, 'active', false);" class="btn btn-outline-success"><i class="fas fa-check"></i>&nbsp;&nbsp;Make Active</button>
+                                    </div>
+                                    <div v-else>
+                                        <button v-if="!user.is_admin" type="button" v-on:click="change_user(user, 'active', true);" class="btn btn-outline-dark"><i class="fas fa-check"></i>&nbsp;&nbsp;Make Admin</button>
+                                        <button v-else type="button" v-on:click="change_user(user, 'active', false);" class="btn btn-outline-dark"><i class="fas fa-check"></i>&nbsp;&nbsp;Remove Admin</button>
+                                        <button type="button" v-on:click="change_user(user, 'inactive', false);" class="btn btn-outline-danger mx-3"><i class="fas fa-times"></i>&nbsp;&nbsp;Make Inactive</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="enabled_btn" type="button" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="users_modal" class="modal fadeIn" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Approve Users</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="users.length == 0">No pending requests</div>
+                        <div v-else>
+                            <div v-for="user in users" class="card mb-3" style="width: 100%;">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{user.name}}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{user.email}}</h6>
+                                    <p class="card-text">Apikey: {{user.api_key}}</p>
+                                    <div v-show="user.status == 'pending'">
+                                        <button type="button" v-on:click="change_user(user, 'active', false);" class="btn btn-outline-success"><i class="fas fa-check"></i>&nbsp;&nbsp;Approve</button>
+                                        <button type="button" v-on:click="change_user(user, 'active', true);" class="btn btn-outline-dark mx-3"><i class="fas fa-check"></i>&nbsp;&nbsp;Make Admin</button>
+                                        <button type="button" v-on:click="change_user(user, 'inactive', false);" class="btn btn-outline-danger"><i class="fas fa-times"></i>&nbsp;&nbsp;Reject</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="enabled_btn" type="button" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="change_password_modal" class="modal fadeIn" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="change_password_form" class="mt-2 mb-2 mx-5">
+                            <div class="row mx-4 mb-2">
+                                <label class="col-1 col-form-label" for="password">
+                                    <i class="fas fa-user"></i>
+                                </label>
+                                <input v-model="password" class="col" type="password" name="password" placeholder="Current Password" id="password" required>
+                            </div>
+                            <div class="row mx-4 mb-2">
+                                <label class="col-1 col-form-label" for="new_password">
+                                    <i class="fas fa-lock"></i>
+                                </label>
+                                <input v-model="new_password" class="col" type="password" name="new_password" placeholder="New Password" id="new_password" required>
+                            </div> 
+                            <div class="row mx-4">
+                                <label class="col-1 col-form-label" for="new_password2">
+                                    <i class="fas fa-lock"></i>
+                                </label>
+                                <input v-model="new_password2" class="col" type="password" name="new_password2" placeholder="Confirm New Password" id="new_password2" required>
+                            </div> 
+
+                            <div class="mb-2">{{msg}}</div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" v-on:click="clear_form"
+                            class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button :class="isDisabled ? 'disabled_btn' : 'enabled_btn'" :disabled='isDisabled' type="button" v-on:click="change_password"
+                            data-bs-dismiss="modal">Change</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="page project-page">
+        <section id="api-server" class="content-section">
+            <div class="content-section-heading text-center pt-5 mb-5">
+                <div class="jumbotron pt-5 mb-5">
+                    <p class="h1 pt-3">Welcome to OKE Transcoding Deployment</p>
+                </div>
+            </div>
+            <div class="container">
+                <div id="new_project_modal" class="modal fadeIn" tabindex="-1">
+                    <div class="modal-dialog modal-xl modal-fullscreen-xl-down modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Project</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="create_project_form" class="mt-2 mb-2 mx-5">
+                                    <div class="mb-3">
+                                        <label for="api_server_address" class="form-label">Name &emsp;&emsp;&emsp;&emsp;</label>
+                                        <input type="text" id="new_project_name"
+                                            aria-describedby="new_project_name" v-model.trim="new_project_name" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new_src_bucket" class="form-label">Source Bucket &emsp;&emsp;&emsp;&emsp;</label>
+                                        <input type="text" id="new_src_bucket"
+                                            aria-describedby="new_src_bucket" v-model.trim="new_src_bucket" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new_dst_bucket" class="form-label">Destination Bucket &emsp;&emsp;&emsp;&emsp;</label>
+                                        <input type="text" id="new_dst_bucket"
+                                            aria-describedby="new_dst_bucket" v-model.trim="new_dst_bucket" class="form-control"> 
+                                    </div>
+
+                                    <span class="btn-link" v-show="!advanced" v-on:click="show_options()"> Show Advanced Options</span>
+
+                                    <span style="cursor: pointer;" class="btn-link" v-show="advanced" v-on:click="show_options()"> Hide Advanced Options</span>
+
+                                    <p class="mt-3 mb-3" v-show="advanced">Note: All rates and sizes are in Millions</p>
+                                    
+                                    <div v-show="advanced" class="row">
+                                        <div class=" col-9 col-sm-9 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-3">
+                                            <label for="number_of_streams" class="form-label">Number of Streams</label>
+                                            <input id="number_of_streams" class="form-range custom-range" type="range" min="1"
+                                                max="10" step="1"  v-model.number="number_of_streams" required>
+                                        </div>
+                                        <div class="col-1 mt-4">
+                                            <span class="border rounded px-3 py-2">{{number_of_streams}}</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="advanced_large" v-show="advanced" v-for="i in number_of_streams" class="row mb-3">
+                                        <div class="col-3">
+                                            <label for="resolution" class="form-label">Resolution</label>
+                                            <select id="resolution" class="form-select"
+                                                v-model.trim="selected_video_resolution[i-1]" required>
+                                                <option value="" selected disabled>Select Resolution</option>
+                                                <option value="3840x2160">
+                                                    3840x2160</option>
+                                                    <option value="1920x1080">
+                                                        1920x1080</option>
+                                                    <option value="1280x720">
+                                                        1280x720</option>
+                                                    <option value="720x576">
+                                                        720x576</option>
+                                                    <option value="720x480">
+                                                        720x480</option>
+                                                    <option value="640x360">
+                                                            640x360</option>
+                                                    <option value="480x360">
+                                                        480x360</option>
+                                                    <option value="320x240">
+                                                        320x240</option>
+                                            </select>
+                                        </div>
+                    
+                                        <div class="col-2">
+                                            <label for="video_bitrate" class="form-label">Video Bitrate</label>
+                    
+                                            
+                                                    <input id="video_bitrate" class="form-control" type="number" min="1"
+                                                        max="50" step="1" v-model="selected_video_bitrate[i-1]" required>
+                                                
+                                        </div>
+                    
+                                        <div class="col-2">
+                                            <label for="video_bitrate_minimum" class="form-label">Min Video Bitrate
+                                                    </label>
+                    
+                                                   <input id="video_bitrate_minimum" class="form-control" type="number"
+                                                        min="1" v-bind:max="selected_video_bitrate[i-1]" step="1"
+                                                        v-model="selected_video_bitrate_minimum[i-1]" required>
+                                             
+                                        </div>
+                    
+                                        <div class="col-2">
+                                            <label for="video_bitrate_maximum" class="form-label">Max Video Bitrate</label>
+                    
+                                                    <input id="video_bitrate_maximum" class="form-control" type="number"
+                                                        v-bind:min="selected_video_bitrate_minimum[i-1]" max="50"
+                                                        step="1" v-model="selected_video_bitrate_maximum[i-1]" required>
+                                                
+                                        </div>
+                    
+                                        <div class="col-2">
+                                            <label for="buffer_size" class="form-label">Buffer Size</label>
+                    
+                                                   <input id="buffer_size" class="form-control" type="number" min="1"
+                                                        max="100" step="1" v-model="selected_buffer_size[i-1]" required>
+                                        </div>
+                                            
+                                    </div>
+                                    <div id="advanced_small" v-show="advanced" v-for="i in number_of_streams" class="row mb-5">
+                                        <span>Stream {{i}}</span>
+                                        <div class="row mt-3 mb-3">
+                                            <label for="resolution" class="form-label">Resolution</label>
+                                            <select id="resolution" class="form-select"
+                                                v-model.trim="selected_video_resolution[i-1]" required>
+                                                <option value="" selected disabled>Select Resolution</option>
+                                                <option value="3840x2160">
+                                                    3840x2160</option>
+                                                    <option value="1920x1080">
+                                                        1920x1080</option>
+                                                    <option value="1280x720">
+                                                        1280x720</option>
+                                                    <option value="720x576">
+                                                        720x576</option>
+                                                    <option value="720x480">
+                                                        720x480</option>
+                                                    <option value="640x360">
+                                                            640x360</option>
+                                                    <option value="480x360">
+                                                        480x360</option>
+                                                    <option value="320x240">
+                                                        320x240</option>
+                                            </select>
+                                        </div>
+                    
+                                        <div class="row mb-3">
+                                            <label for="video_bitrate" class="form-label">Video Bitrate</label>
+                    
+                                            
+                                                    <input id="video_bitrate" class="form-control" type="number" min="1"
+                                                        max="50" step="1" v-model="selected_video_bitrate[i-1]" required>
+                                                
+                                        </div>
+                    
+                                        <div class="row mb-3">
+                                            <label for="video_bitrate_minimum" class="form-label">Min Video Bitrate
+                                                    </label>
+                    
+                                                   <input id="video_bitrate_minimum" class="form-control" type="number"
+                                                        min="1" v-bind:max="selected_video_bitrate[i-1]" step="1"
+                                                        v-model="selected_video_bitrate_minimum[i-1]" required>
+                                             
+                                        </div>
+                    
+                                        <div class="row mb-3">
+                                            <label for="video_bitrate_maximum" class="form-label">Max Video Bitrate</label>
+                    
+                                                    <input id="video_bitrate_maximum" class="form-control" type="number"
+                                                        v-bind:min="selected_video_bitrate_minimum[i-1]" max="50"
+                                                        step="1" v-model="selected_video_bitrate_maximum[i-1]" required>
+                                                
+                                        </div>
+                    
+                                        <div class="row mb-5">
+                                            <label for="buffer_size" class="form-label">Buffer Size</label>
+                    
+                                                   <input id="buffer_size" class="form-control" type="number" min="1"
+                                                        max="100" step="1" v-model="selected_buffer_size[i-1]" required>
+                                                </div>
+                                            
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" v-on:click="clear_form"
+                                    class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button :disabled='!isDisabled2' type="button" v-on:click="create_project()" class="btn btn-primary"
+                                    data-bs-dismiss="modal">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="state_switch_modal" class="modal fadeIn" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 v-if="selected_project.state=='inactive'" class="modal-title">Activate {{selected_project.name}}</h5>
+                                <h5 v-else" class="modal-title">Deactivate {{selected_project.name}}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div v-if="selected_project.state=='inactive'" class="modal-body">
+                                <p class="lead" style="word-wrap: break-word;">Are you sure you want to activate project?</p><br>
+                            </div>
+                            <div v-else class="modal-body">
+                                <p class="lead" style="word-wrap: break-word;">Are you sure you want to deactivate project?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" v-on:click="switch_state(selected_project)" class="btn btn-primary"
+                                    data-bs-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--form id="api_server_form" class="mt-5 mb-5">
+                    <div class="display:flex; flex-direction: row; justify-content: center; align-items: center">
+                        <label for="api_server_address">Enter the api-server address to start &emsp;&emsp;&emsp;&emsp;</label>
+                        <input type="text" id="api_server_address"
+                            aria-describedby="api_server_address_help" v-model.trim="api_server_address">
+                        <button :disabled='isDisabled' class="btn btn-primary mx-4" type="button"
+                        v-on:click="fetch_projects();">Connect</button>
+                    </div>
+                </form-->  
+                
+                <div id="stats" class="statistics">
+                    <p class="h4 mb-4"><u>Dashboard</u></p>
+                    <div class="row gallery">
+                        <div class="col-md-4 col-lg-3 mb-5">
+                            <div style="background-color: #b1a181" class="card border-0 scale-on-hover">
+                                <div style="cursor: pointer;" 
+                                    class="card-img-top">
+                                    <p class="h1  mt-2" style="text-align:center">{{number_transcoded_videos}}</p></div>
+                                <div style="cursor: pointer;" class="card-body">
+                                    <p class="h6 text-center">Number of Transcoded Videos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3 mb-5">
+                            <div style="background-color: #b1a181" class="card border-0 scale-on-hover">
+                                <div style="cursor: pointer;" 
+                                    class="card-img-top">
+                                    <p class="h1  mt-2" style="text-align:center">{{number_jobs_running}}</p></div>
+                                <div style="cursor: pointer;" class="card-body">
+                                    <p class="h6 text-center">Number of Active Jobs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3 mb-5">
+                            <div style="background-color: #b1a181" class="card border-0 scale-on-hover">
+                                <div style="cursor: pointer;" 
+                                    class="card-img-top">
+                                    <p class="h1 mt-2" style="text-align:center">{{number_jobs_completed}}</p></div>
+                                <div style="cursor: pointer;" class="card-body">
+                                    <p class="h6 text-center">Number of Completed Jobs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3 mb-5">
+                            <div style="background-color: #b1a181" class="card border-0 scale-on-hover">
+                                <div style="cursor: pointer;" 
+                                    class="card-img-top">
+                                    <p class="h1  mt-2" style="text-align:center">{{number_jobs_error}}</p></div>
+                                <div style="cursor: pointer;" class="card-body">
+                                    <p class="h6 text-center">Number of Jobs with Errors</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="projects.length == 0" class="mb-5">
+                    No projects found. Create a project to begin.
+                </div>
+                <div v-else class="mb-5">
+                    <p class="h4"><u>Projects</u></p>
+                    <table id="projects-table" class="table table-hover table-responsive table-fixed">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%; background-color: white;" scope="col">ID</th>
+                                <th style="width: 21%; background-color: white;" scope="col">Name</th>
+                                <th style="text-align: center; width: 21%; background-color: white;" scope="col">
+                                    Status</th>
+                                <th style="text-align: center; width: 21%; background-color: white;" scope="col">
+                                    Input Bucket</th>
+                                <th style="text-align: center; width: 21%; background-color: white;" scope="col">
+                                    Output Bucket</th>
+                                <th style="width: 6%; background-color: white;" scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="project in projects">
+                                <td scope="row">{{project.id}}</td>
+                                <td scope="row"><a v-bind:href="'project.html?p='+project.id" target="_blank">{{project.name}}</a></td>
+                                <td style="text-align: center;">{{project.state}}
+                                </td>
+                                <td style="text-align: center;">
+                                    {{project.input_bucket}}</td>
+                                <td style="text-align: center;">{{project.output_bucket}}
+                                </td>
+                                <td style="text-align: center;">
+                                    <div class="dropdown">
+                                        <span class=""  id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <img src="assets/img/three-dots-vertical.svg"/>
+                                        </span>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                          <li><a class="dropdown-item" v-bind:href="'project.html?p='+project.id" target="_blank">Open</a></li>
+                                          <li v-on:click="selected_project=project" v-if="project.state=='active'"><a class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#state_switch_modal">Make Inactive</a></li>
+                                          <li v-on:click="selected_project=project" v-else><a class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#state_switch_modal">Make Active</a></li>
+                                          <li><a class="dropdown-item" href="#">Edit Configuration</a></li>
+                                        </ul>
+                                      </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="jobs.length == 0" class="mb-5">
+                    No Jobs found.
+                </div>
+                <div v-else class="mb-5">
+                    <p class="h4 mb-4"><u>All Jobs</u></p>
+                    <div class="form-check form-check-inline">
+                        <label class="mb-3">Select to filter by status type</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox1" v-model="jobs_filter_status[0]">
+                        <label class="form-check-label" for="inlineCheckbox1">Completed</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox2"  v-model="jobs_filter_status[1]">
+                        <label class="form-check-label" for="inlineCheckbox2">Running</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input @change="filter();" class="form-check-input" type="checkbox" id="inlineCheckbox3"  v-model="jobs_filter_status[2]">
+                        <label class="form-check-label" for="inlineCheckbox3">Error</label>
+                      </div>
+                    <table id="jobs-table" class="table table-hover table-responsive table-fixed table-wrap">
+                        <thead>
+                            <tr>
+                                <th v-on:click="" style="width: 15%; background-color: white;" scope="col">Input File</th>
+                                <th v-on:click="" style="text-align: center; width: 10%; background-color: white;" scope="col">
+                                    Status</th>
+                                <th v-on:click="" style="text-align: center; width: 9%; background-color: white;" scope="col">
+                                    Project ID</th>
+                                <th v-on:click="" style="text-align: center; width: 22%; background-color: white;" scope="col">
+                                    Start Time</th>
+                                <th v-on:click="" style="text-align: center; width: 22%; background-color: white;" scope="col">
+                                        End Time</th>
+                                <th v-on:click="" style="text-align: center; width: 22%; background-color: white;" scope="col">Transcoded Path</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             <tr v-for="job in filtered_jobs">
+                                  <td v-on:click="" scope="row">{{job.input_file}}</td>
+                                  <td style="text-align: center;">{{job.status}}
+                                </td>
+                                <td v-on:click="" scope="row" style="text-align: center;"><a v-bind:href="'project.html?p='+job.project_id" target="_blank">{{job.project_id}}</a></td>
+                                <td style="text-align: center;">{{job.start_time}}
+                                </td>
+                                <td style="text-align: center;">{{job.end_time}}
+                                </td>
+                                <td style="text-align: center;">{{job.transcoded_path}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            
+            
+
+            
+            
+            <!--div class="container">
+                <div class="playlist">
+                    <h3 class="text-center">Playlist</h3>
+                    <div class="row gallery">
+                        <div v-for="(thumbnail, index) in thumbnails" class="col-md-4 col-lg-3">
+                            <div class="card border-0"><img style="cursor: pointer;" v-on:click="play_video(playlist[index].name)"
+                                    class="card-img-top scale-on-hover"
+                                    v-bind:src="base_end_point+thumbnail.name" alt="Card Image">
+                                <div style="cursor: pointer;" v-on:click="play_video(playlist[index].name)" class="card-body">
+                                    <p class="h6 text-center">{{playlist[index].name.split('/')[0]}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div-->
+        </section>
+        
+        <section id="create_project" class="content-section">
+            <div class="container">
+                
+            </div>
+            
+        </section>
+
+    </main>
+    <footer class="page-footer">
+        <div class="container">
+            <p class="text-muted mb-0">Copyright &nbsp;© Oracle</p>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.1.5/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="assets/js/transcodingOKE.js"></script>
+</body>
+
+</html>

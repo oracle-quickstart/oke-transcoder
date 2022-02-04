@@ -31,7 +31,7 @@ def simple_message_loop(client, stream_id, initial_cursor, src_bucket):
             try:
 #              print(b64decode(message.value.encode()).decode())
               msg_body = json.loads(b64decode(message.value.encode()).decode())
-              if msg_body['eventType']=='com.oraclecloud.objectstorage.createobject' and \
+              if msg_body['eventType'] in ('com.oraclecloud.objectstorage.createobject', 'com.oraclecloud.objectstorage.updateobject') and \
                  msg_body['source']=='ObjectStorage':
 
                  new_file = msg_body['data']['resourceName']

@@ -1,0 +1,76 @@
+.login, .register, .reset {
+    width: 25em;
+    background-color: #ffffff;
+    box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.3);
+    margin: 7em auto;
+}
+.login p, .register p{
+    text-align: center;
+    color: #5b6574;
+    border-bottom: 0.05em solid #dee0e4;
+}
+
+.reset p{
+    text-align: center;
+    color: #5b6574;
+}
+
+.login .links, .register .links, .reset .links{
+    cursor: pointer;
+}
+.login .links a, .register .links a, .reset .links a {
+    color: #adb2ba;
+    text-decoration: none;
+    display: inline-flex;
+    
+}
+.login .links a:hover, .register .links a:hover, .reset .links a:hover {
+    color: #9da3ac;
+}
+.login .links a.active, .register .links a.active, .reset .links a.active {
+    border-bottom: 0.2em solid #5b6574;
+    color: #5b6574;
+}
+
+#form_div label, #register_div label, #reset_div label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3em;
+    height: 3em;
+    background-color: #bca782;
+    color: #ffffff;
+}
+#password, #username, #email, #rpassword, #rusername, #rppassword, #rpusername, #rpapikey {
+    height: 3em;
+    border: 0.1em solid #dee0e4;
+    margin-bottom: 1em;
+    
+}
+
+.disabled_btn{
+    width: 100%;
+    height: 4em;
+    filter:grayscale(100%);
+    background-color: #bca782;
+    border: 0em;
+    cursor: default;
+    font-weight: bold;
+    color: black;
+}
+
+.enabled_btn{
+    width: 100%;
+    height: 4em;
+    background-color: #bca782;
+    border: 0em;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.link{
+    cursor: pointer;
+    color:blue;
+    text-decoration:underline;
+}

@@ -265,7 +265,7 @@ resource "null_resource" "build_scheduler_docker_image" {
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/scheduler",
-      "docker build -t scheduler:${var.image_label} . --no-cache"
+      "docker build -t transcoder-scheduler:${var.image_label} . --no-cache"
     ]
   }
 }
@@ -369,13 +369,62 @@ resource "null_resource" "build_api_docker_image" {
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/api",
-      "openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365 -subj ${var.ssl_cert_subject}",
-      "docker build -t api-server:${var.image_label} . --no-cache"
+      "docker build -t transcoder-api:${var.image_label} . --no-cache"
     ]
   }
 }
 
-# Push sheduler and transcoder and api-server docker images to OCIR registry
+# Build transcoder-nginx docker image
+
+data "template_file" "nginx_dockerfile" {
+  template = file("${path.module}/../../userdata/nginx/Dockerfile")
+}
+data "template_file" "nginx_conf" {
+  template = file("${path.module}/../../userdata/nginx/nginx.conf")
+}
+
+resource "null_resource" "build_nginx_docker_image" {
+  depends_on = [null_resource.install_docker]
+
+  connection {
+    host        = var.instance_ip
+    private_key = var.ssh_private_key
+    timeout     = "40m"
+    type        = "ssh"
+    user        = "opc"
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p $HOME/transcoder/nginx",
+      "mkdir -p $HOME/transcoder/nginx/js"
+        ]
+  }
+
+  provisioner "file" {
+    content     = data.template_file.nginx_dockerfile.rendered
+    destination = "~/transcoder/nginx/Dockerfile"
+  }
+
+  provisioner "file" {
+    content     = data.template_file.nginx_conf.rendered
+    destination = "~/transcoder/nginx/nginx.conf"
+  }
+
+  provisioner "file" {
+    source     = "${path.module}/../../userdata/js"
+    destination = "~/transcoder/nginx"
+  }   
+
+  provisioner "remote-exec" {
+    inline = [
+      "cd $HOME/transcoder/nginx",
+      "docker build -t transcoder-nginx:${var.image_label} . --no-cache"
+    ]
+  }
+}
+
+# Push transcoder, transcoder-scheduler, transcoder-api and transcoder-nginx docker images to OCIR registry
 data "template_file" "push_to_registry" {
   template = file("${path.module}/../../userdata/scripts/push_to_registry.sh")
   vars = {
@@ -390,7 +439,7 @@ data "template_file" "push_to_registry" {
 }
 
 resource "null_resource" "push_to_registry" {
-  depends_on = [null_resource.install_docker, null_resource.build_scheduler_docker_image, null_resource.build_transcoder_docker_image, null_resource.build_api_docker_image]
+  depends_on = [null_resource.install_docker, null_resource.build_scheduler_docker_image, null_resource.build_transcoder_docker_image, null_resource.build_api_docker_image, null_resource.build_nginx_docker_image]
 
   connection {
     host        = var.instance_ip
@@ -409,9 +458,10 @@ resource "null_resource" "push_to_registry" {
     inline = [
       "cd $HOME/transcoder/build",
       "chmod +x push_to_registry.sh",
-      "./push_to_registry.sh scheduler",
       "./push_to_registry.sh transcoder",
-      "./push_to_registry.sh api-server"
+      "./push_to_registry.sh transcoder-scheduler",
+      "./push_to_registry.sh transcoder-api",
+      "./push_to_registry.sh transcoder-nginx"
     ]
   }
 }
@@ -479,6 +529,8 @@ data "template_file" "deploy" {
     project_name = var.project_name
     src_bucket = var.src_bucket
     dst_bucket = var.dst_bucket
+    admin_tc_user = var.admin_tc_user
+    admin_tc_password = var.admin_tc_password
   }
 }
 
@@ -498,7 +550,6 @@ data "template_file" "configmap_template" {
     stream_ocid = var.stream_ocid
     stream_endpoint = var.stream_endpoint
     ffmpeg_config = var.ffmpeg_config
-    ffmpeg_stream_map = var.ffmpeg_stream_map
     hls_stream_url = var.hls_stream_url
     db_ip = var.db_ip
     db_name = var.db_name
@@ -521,7 +572,7 @@ data "template_file" "scheduler_template" {
     registry = var.registry
     tenancy_name = data.oci_objectstorage_namespace.lookup.namespace
     repo_name = var.repo_name
-    image_name = "scheduler"
+    image_name = "transcoder-scheduler"
     image_label = var.image_label
     nodepool_label = var.nodepool_label
     project_name = var.project_name
@@ -535,13 +586,17 @@ data "template_file" "api_server_template" {
     registry = var.registry
     tenancy_name = data.oci_objectstorage_namespace.lookup.namespace
     repo_name = var.repo_name
-    image_name = "api-server"
+    api_image_name = "transcoder-api"
+    nginx_image_name = "transcoder-nginx"
     image_label = var.image_label
     nodepool_label = var.nodepool_label
     project_name = var.project_name
   }
 }
 
+data "template_file" "generate_admin_password" {
+  template = file("${path.module}/../../userdata/scripts/generate_admin_password.py")
+}
 
 resource "null_resource" "deploy_containers" {
  depends_on = [null_resource.push_to_registry, null_resource.create_db, null_resource.node_lifecycle, null_resource.generate_kubeconfig, null_resource.install_kubectl]
@@ -585,10 +640,15 @@ resource "null_resource" "deploy_containers" {
     destination = "~/transcoder/build/deploy.sh"
   }
 
+  provisioner "file" {
+    content     = data.template_file.generate_admin_password.rendered
+    destination = "~/transcoder/build/generate_admin_password.py"
+  }
 
   provisioner "remote-exec" {
     inline = [
       "cd $HOME/transcoder/build",
+      "openssl req -x509 -newkey rsa:4096 -nodes -out ssl.crt -keyout ssl.key -days 365 -subj ${var.ssl_cert_subject}",
       "chmod +x deploy.sh",
       "./deploy.sh"
     ]

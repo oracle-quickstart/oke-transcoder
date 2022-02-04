@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/css/main.css">
+		<link rel="stylesheet" href="assets/css/login.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,700">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.0.10/hls.js"></script>
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+	</head>
+	<body>
+        <main class="page project-page">
+            <section id="login_section" class="content-section">
+                <div style="background-color: #bca782;" class="content-section-heading text-center pb-5 pt-5">
+                    <div class="jumbotron">
+                        <h1>Welcome to OKE Transcoding Deployment</h1>
+                    </div>
+                </div>
+                <div id="form_div" v-show="sw==0" class="login">
+                    <p class="h2 py-3">Login</p>
+                    <div class="links mx-4 mt-2 mb-3">
+                        <a class="active px-2 py-2">Login</a>
+                        <a class="px-4" v-on:click="switch_tabs();">Register</a>
+                    </div>
+                    <div class="">
+                        <div class="row mx-4 mb-2">
+                            <label class="col-1 col-form-label" for="username">
+                                <i class="fas fa-user"></i>
+                            </label>
+                            <input v-model="username" class="col" type="text" name="username" placeholder="Username" id="username" required>
+                        </div>
+                        <div class="row mx-4">
+                            <label class="col-1 col-form-label" for="password">
+                                <i class="fas fa-lock"></i>
+                            </label>
+                            <input v-model="password" class="col" type="password" name="password" placeholder="Password" id="password" required>
+                            <div class="mb-2">{{msg}}</div>
+                            <span class="link" v-on:click="sw = 3; switch_tabs()">Forgot Password</span>
+                        </div>
+                        <button class="mt-4" :class="isDisabled ? 'disabled_btn' : 'enabled_btn'" :disabled="isDisabled" id="lbutton" type="button" v-on:click="login()">Login</button>
+                    </div>
+                </div> 
+                <div id="register_div" v-show="sw==1" class="register">
+                    <p class="h2 py-3">Register</p>
+                    <div class="links mx-4 mt-2 mb-3">
+                        <a v-on:click="switch_tabs();" class="px-2 py-2">Login</a>
+                        <a class="active ms-3 px-2">Register</a>
+                    </div>
+                    <div class="" autocomplete="off">
+                        <div class="row mx-4 mb-2">
+                            <label class="col-1 col-form-label" for="rusername">
+                                <i class="fas fa-user"></i>
+                            </label>
+                            <input v-model="name" class="col" type="text" name="rusername" placeholder="Name" id="rusername" required>
+                        </div>
+                        <div class="row mx-4 mb-2">
+                            <label class="col-1 col-form-label" for="email">
+                                <i class="fas fa-envelope"></i>
+                            </label>
+                            <input v-model="username" class="col" type="email" name="email" placeholder="Username (Email)" id="email" required>
+                        </div>
+                        <div class="row mx-4">
+                            <label class="col-1 col-form-label" for="rpassword">
+                                <i class="fas fa-lock"></i>
+                            </label>
+                            <input v-model="password" class="col" type="password" name="rpassword" placeholder="Password" id="rpassword" required>
+                            <div class="mt-2" class="msg">{{ msg }}</div>
+                        </div>
+                        <!--div class="row mx-0 form-check">
+                            <input v-model="is_admin" class="col-1" type="checkbox" value="" id="is_admin">
+                              <span class="col-11">Request Admin Access</span>
+                              
+                        </div-->
+                        <button class="mt-4" :class="isDisabled2 ? 'disabled_btn' : 'enabled_btn'" :disabled="isDisabled2" id="rbutton" type="button" v-on:click="register()">Register</button>
+                    </div>   
+                </div>
+                <div id="reset_div" v-show="sw==2" class="reset">
+                    <p class="h2 py-3">Reset Password</p>
+                    <div class="" autocomplete="off">
+                        <div class="row mx-4 mt-2 mb-2">
+                            <label class="col-1 col-form-label" for="rpusername">
+                                <i class="fas fa-user"></i>
+                            </label>
+                            <input v-model="username" class="col" type="text" name="rpusername" placeholder="Username" id="rpusername" required>
+                        </div>
+                        <div class="row mx-4 mb-2">
+                            <label class="col-1 col-form-label" for="rppassword">
+                                <i class="fas fa-lock"></i>
+                            </label>
+                            <input v-model="password" class="col" type="password" name="rppassword" placeholder="New password" id="rppassword" required>
+                        </div>
+                        <div class="row mx-4">
+                            <label class="col-1 col-form-label" for="rpapikey">
+                                <i class="fas fa-lock"></i>
+                            </label>
+                            <input v-model="apikey" class="col" type="text" name="rpapikey" placeholder="Apikey" id="rpapikey" required>
+                            <div class="mb-2">{{msg}}</div>
+                            <span class="link" v-on:click="switch_tabs()">Back to Login</span>
+                        </div>
+                        <button class="mt-4" :class="isDisabled3 ? 'disabled_btn' : 'enabled_btn'" :disabled="isDisabled3" id="rpbutton" type="button" v-on:click="forgot_password()">Reset Password</button>
+                    </div>   
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer">
+            <div class="container">
+                <p class="text-muted mb-0">Copyright &nbsp;© Oracle</p>
+            </div>
+        </footer>
+	</body>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.1.5/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script src="assets/js/login.js"></script>
+</html>

@@ -129,8 +129,9 @@ module "transcoder" {
   dst_bucket = var.dst_bucket
   stream_ocid = module.oci-stream.stream_id
   stream_endpoint = module.oci-stream.messages_endpoint
+  admin_tc_user = var.admin_tc_user
+  admin_tc_password = var.admin_tc_password
   ffmpeg_config = var.ffmpeg_config
-  ffmpeg_stream_map = var.ffmpeg_stream_map
   hls_stream_url = var.hls_stream_url
   cpu_request_per_job = var.cpu_request_per_job
   cluster_autoscaling = var.cluster_autoscaling

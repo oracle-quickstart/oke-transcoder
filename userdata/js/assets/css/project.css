@@ -1,0 +1,48 @@
+.disabled_btn{
+    width: 18%;
+    height: 2.4em;
+    filter:grayscale(100%);
+    background-color: #bca782;
+    border: 0em;
+    border-radius: 3em;
+    cursor: default;
+    font-weight: bold;
+    color: black;
+}
+
+.enabled_btn{
+    width: 18%;
+    height: 2.4em;
+    background-color: #bca782;
+    border-radius: 3em;
+    border: 0em;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+
+#change_password_form label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3em;
+    height: 3em;
+    background-color: #bca782;
+    color: #ffffff;
+}
+#password, #new_password {
+    height: 3em;
+    border: 0.1em solid #dee0e4;
+    margin-bottom: 1em;
+    
+}
+
+.form-check-input, .form-check-input:focus{
+    outline: none;
+}
+
+.form-check-input:checked {
+    background-color: #bca782;
+    border-color: white;
+}

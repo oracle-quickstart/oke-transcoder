@@ -2,7 +2,8 @@
 #/bin/bash
 
 # Install MySQL client
-sudo yum install -y https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+sudo yum install -y https://repo.mysql.com/mysql80-community-release-el7-5.noarch.rpm
+#sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
 sudo yum install -y mysql
 
 # Connect to MySQL instance and create transcoding database and user
@@ -51,6 +52,20 @@ create table if not exists projects(
    input_bucket_PAR VARCHAR(200),
    output_bucket_PAR VARCHAR(200),
    state VARCHAR(10) NOT NULL,
+   PRIMARY KEY ( id )
+);
+EOF
+
+# Create users table
+mysql -h ${db_ip} -D ${db_name} -u ${db_user} -p${db_password} << EOF
+create table if not exists users(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(50) NOT NULL,
+   email VARCHAR(50) NOT NULL UNIQUE,
+   password VARCHAR(100) NOT NULL,
+   is_admin BOOLEAN NOT NULL,
+   api_key VARCHAR(50) NOT NULL,
+   status VARCHAR(10) NOT NULL,
    PRIMARY KEY ( id )
 );
 EOF
