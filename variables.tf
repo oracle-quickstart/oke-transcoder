@@ -171,7 +171,7 @@ variable "registry_user" {
 }
 
 variable "image_label" {
-  default = "1.6"
+  default = "1.7"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -285,14 +285,19 @@ variable project_name {
   default = "transcode"
 }
 
-variable "ffmpeg_config" {
+variable "ffmpeg_streaming_protocol" {
+  default = "HLS"                       # Can be set to HLS or DASH
+}
+
+variable "ffmpeg_hls_config" {
   type = string
   default = <<EOF
   -map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M 
   -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M 
   -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M 
   -map a:0? -map a:0? -map a:0? -c:a aac -b:a 128k -ac 1 -ar 44100 
-  -g 48 -sc_threshold 0 -c:v libx264 
+  -keyint_min 48 -g 48 
+  -c:v libx264 -sc_threshold 0 
   -f hls 
   -hls_time 5  
   -hls_playlist_type vod 
@@ -301,15 +306,32 @@ variable "ffmpeg_config" {
   EOF
 }
 
+variable "ffmpeg_dash_config" {
+  type = string
+  default = <<EOF
+  -map v:0 -s:0 1920x1080 -b:v:0 5M -maxrate 5M -minrate 5M -bufsize 10M 
+  -map v:0 -s:1 1280x720 -b:v:1 3M -maxrate 3M -minrate 3M -bufsize 3M 
+  -map v:0 -s:2 640x360 -b:v:2 1M -maxrate 1M -minrate 1M -bufsize 1M 
+  -map a:0? -c:a aac -b:a 128k -ac 1 -ar 44100
+  -keyint_min 48 -g 48 
+  -c:v libx264 -sc_threshold 0 
+  -f dash 
+  -use_template 1 
+  -use_timeline 1  
+  -seg_duration 5 
+  EOF
+}
+
 #variable "ffmpeg_stream_map" {
 #  default = "v:0,a:0 v:1,a:1 v:2,a:2"
 #}
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # CDN settings
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "hls_stream_url" {
+variable "cdn_base_url" {
   default = ""
 }
 

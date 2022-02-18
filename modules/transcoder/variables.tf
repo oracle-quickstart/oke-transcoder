@@ -27,7 +27,7 @@ variable "dst_bucket" {}
 variable "stream_ocid" {}
 variable "stream_endpoint" {}
 variable "ffmpeg_config" {}
-variable "hls_stream_url" {}
+variable "cdn_base_url" {}
 variable "cpu_request_per_job" {}
 variable "cluster_autoscaling" {}
 variable "oci_cluster_autoscaler_image" {}

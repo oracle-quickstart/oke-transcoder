@@ -48,28 +48,53 @@ audio_duration=$(ffprobe -v error -of flat=s_ -select_streams a -show_entries st
 
 number_of_video_streams=$(echo $TC_FFMPEG_CONFIG | egrep -o "\-map +v" | wc -l)
 
-# Set FFMPEG Stream Map 
+# Check what streaming protocol is used
+
+if [[ "$TC_FFMPEG_CONFIG" == *" -f hls"* ]]; then
+    streaming_protocol="HLS"
+    manifest_name="master.m3u8"
+elif [[ "$TC_FFMPEG_CONFIG" == *" -f dash"* ]]; then
+    streaming_protocol="DASH"
+    manifest_name="dash.mpd"
+else
+    echo "Unsupported streaming protocol. Supported protocols are HLS & DASH"
+    exit 1
+fi
+
+# If HLS protocol is used set FFMPEG Stream Map for HLS
 # v:0,a:0 v:1,a:1 ... (if there are both video and audio streams) 
 # v:0 v:1 ... (if there are only video streams)
 
 TC_FFMPEG_STREAM_MAP=""
 
-if [ "$audio_duration" ]; then
+if [[ $streaming_protocol == "HLS" ]]; then
+  #Set stream map between video and audio streams for HLS 
+
+  if [ "$audio_duration" ]; then
     for ((i=0;i<$number_of_video_streams;i++)) 
     do   
         TC_FFMPEG_STREAM_MAP="$TC_FFMPEG_STREAM_MAP v:$i,a:$i"
     done
-else
+  else
     echo "No audio stream"
     for ((i=0;i<$number_of_video_streams;i++)) 
     do   
         TC_FFMPEG_STREAM_MAP="$TC_FFMPEG_STREAM_MAP v:$i"
-    done   
+    done
+  fi
+
+  #Run HLS transcoding
+  echo "Transcoding file $INPUT_FILE"
+  ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "$TC_FFMPEG_STREAM_MAP" stream_%v.m3u8     
+
+else  #Set stream map between video and audio streams for DASH   
+  TC_FFMPEG_STREAM_MAP="id=0,streams=v id=1,streams=a"
+
+  #Run DASH transcoding
+  echo "Transcoding file $INPUT_FILE"
+  ffmpeg -i $ifile $TC_FFMPEG_CONFIG -adaptation_sets "$TC_FFMPEG_STREAM_MAP" dash.mpd
 fi
 
-#Run ffmpeg transcoding
-echo "Transcoding file $INPUT_FILE"
-ffmpeg -i $ifile $TC_FFMPEG_CONFIG -var_stream_map "$TC_FFMPEG_STREAM_MAP" stream_%v.m3u8
 
 if [ $? -eq 0 ]; then
         echo "Successfully transcoded $INPUT_FILE"
@@ -106,15 +131,15 @@ oci os object put --namespace $OS_NAMESPACE --bucket-name $OUTPUT_BUCKET --file 
 
 #Update jobs table with the job status
 echo "Updating jobs table with COMPLETED job status"
-$SQL_CONNECT "update jobs set transcoded_path='$INPUT_FILE/master.m3u8', status='COMPLETED', end_time=now() where id=$job_id"
+$SQL_CONNECT "update jobs set transcoded_path='$INPUT_FILE/$manifest_name', status='COMPLETED', end_time=now() where id=$job_id"
 
 #Update transcoded_files table
 echo "Adding $INPUT_FILE to transcoded_files table"
 
-if [ ! -z $TC_FFMPEG_HLS_BASE_URL ]; then
-  URL="$TC_FFMPEG_HLS_BASE_URL/$INPUT_FILE/master.m3u8"
+if [ ! -z $TC_CDN_BASE_URL ]; then
+  URL="$TC_CDN_BASE_URL/$INPUT_FILE/$manifest_name"
 else
   URL=""
 fi
 
-$SQL_CONNECT "delete from transcoded_files where name='$INPUT_FILE' and bucket='$OUTPUT_BUCKET'; insert into transcoded_files (name, object, bucket, job_id, create_time, thumbnail, url) values ('$INPUT_FILE', '$INPUT_FILE/master.m3u8', '$OUTPUT_BUCKET', $job_id, now(), 'thumbnails/$THUMB_FILE', '$URL')"
+$SQL_CONNECT "delete from transcoded_files where name='$INPUT_FILE' and bucket='$OUTPUT_BUCKET'; insert into transcoded_files (name, object, bucket, job_id, create_time, thumbnail, url) values ('$INPUT_FILE', '$INPUT_FILE/$manifest_name', '$OUTPUT_BUCKET', $job_id, now(), 'thumbnails/$THUMB_FILE', '$URL')"

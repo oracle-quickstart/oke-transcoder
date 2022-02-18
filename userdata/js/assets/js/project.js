@@ -1,8 +1,3 @@
-var userName = "RestApiUser";
-var passWord = "Tr@nsc0de!";
-
-//var base_end_point = "https://objectstorage.us-ashburn-1.oraclecloud.com/p/qb8pLDV51o42MV9m2VNi2HxLQZQkbmoPHV0an1Hc_uGT4e-v8zeLj2kVeRlMW0A5/n/ocisateam/b/sourceBucket/o/"; Previously used to upload objects
-
 var region_os_end_point = "https://objectstorage.us-ashburn-1.oraclecloud.com";
 
 const video_player = {
@@ -13,6 +8,10 @@ const video_player = {
 			dst_bucket: '',
 			advanced: false,
 			number_of_streams: 0,
+			codec: 'libx264 -sc_threshold 0',
+			seg_dur: 5,
+			gop_size: 48,
+			protocol: '',
 			selected_video_resolution: ['1920x1080', '1280x720', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360'],
             selected_video_bitrate : [5, 3, 1, 1, 1, 1, 1, 1, 1, 1],
             selected_video_bitrate_minimum : [5, 3, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -47,7 +46,7 @@ const video_player = {
 			jobs_filter_status: [true,true,true],
 			
 			base_end_point: "https://objectstorage.us-ashburn-1.oraclecloud.com/p/whADXRSimat_aU48js9EzvabSBvNLDU6yQDAxGx9z0er2uVyLKtVHVN6CYV25hkJ/n/ocisateam/b/output_images/o/",
-			hls : '',
+			
 		}
 	},
 	async mounted() {
@@ -97,14 +96,22 @@ const video_player = {
 			const element = this.$refs.vp;
 			element.scrollIntoView();
 			this.source = this.base_end_point + this.videos[0].object;
-			if (Hls.isSupported()) {
-				this.hls = new Hls();
-				this.hls.loadSource(this.source);
-				this.hls.attachMedia(element);
-				this.hls.on(Hls.Events.MANIFEST_PARSED, function () {
-					this.$refs.vp.play();
-				});
-			}
+			
+			if(this.videos[0].object.charAt(this.videos[0].object.length - 1) == 'd')
+			{
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("#vp"), this.source, true);
+			}	
+			else{
+				if (Hls.isSupported()) {
+					this.hls = new Hls();
+					this.hls.loadSource(this.source);
+					this.hls.attachMedia(element);
+					this.hls.on(Hls.Events.MANIFEST_PARSED, function () {
+						this.$refs.vp.play();
+					});
+				}
+			}			
 		}
 
 
@@ -160,12 +167,22 @@ const video_player = {
 				element.play();
 			});*/
 			this.source = this.base_end_point + video.object;
-			this.hls.loadSource(this.source);
-			this.hls.attachMedia(element);
-			this.hls.on(Hls.Events.MANIFEST_PARSED, function () {
-				element.play();
-			});
 
+			if(video.object.charAt(video.object.length - 1) == 'd'){
+				var player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("#vp"), this.source, true);
+			}
+			else{
+				if (Hls.isSupported()) {
+					if(this.hls=='')
+						this.hls = new Hls();
+					this.hls.loadSource(this.source);
+					this.hls.attachMedia(element);
+					this.hls.on(Hls.Events.MANIFEST_PARSED, function () {
+						element.play();
+					});
+				}
+			}
 		},
 		filter: function(){
 			this.filtered_jobs = [];
@@ -369,17 +386,29 @@ const video_player = {
 		},
 		update_configuration: async function(){
 			var ffmpeg_command = ' ';
+
 			for(let i = 0; i < this.number_of_streams; i++){
 				ffmpeg_command = ffmpeg_command + ' -map v:0 -s:'+i+' '+ this.selected_video_resolution[i]+ ' -b:v:'+i+' '+ this.selected_video_bitrate[i]+'M -maxrate '+ this.selected_video_bitrate_maximum[i]+'M -minrate '+ this.selected_video_bitrate_minimum[i]+'M -bufsize '+ this.selected_buffer_size[i] +'M';
 			}
-			for(let i = 0; i < this.number_of_streams; i++){
-				ffmpeg_command = ffmpeg_command + ' -map a:0'
+
+			ffmpeg_command = ffmpeg_command + ' -map a:0?';
+			if(this.protocol == 'hls'){
+				for(let i = 1; i < this.number_of_streams; i++){
+					ffmpeg_command = ffmpeg_command + ' -map a:0?';
+				}
 			}
-			ffmpeg_command = ffmpeg_command + ' -c:a aac -b:a 128k -ac 1 -ar 44100 -g 48 -sc_threshold 0 -c:v libx264 -f hls -hls_time 5 -hls_playlist_type vod -hls_segment_filename stream_%v_%03d.ts -master_pl_name master.m3u8 ';
-			var ffmpeg_stream_map = 'v:0,a:0';
+
+			ffmpeg_command = ffmpeg_command + ' -c:a aac -b:a 128k -ac 1 -ar 44100 -keyint_min ' + this.gop_size +' -g ' + this.gop_size+ ' -c:v ' + this.codec + ' -f '+ this.protocol;
+			
+			if(this.protocol == 'hls')
+				ffmpeg_command = ffmpeg_command + ' -hls_time ' + this.seg_dur+ ' -hls_playlist_type vod -hls_segment_filename stream_%v_%03d.ts -master_pl_name master.m3u8 ';
+			else
+				ffmpeg_command = ffmpeg_command + ' -seg_duration ' + this.seg_dur+ ' -use_template 1 -use_timeline 1';
+			
+			/*	var ffmpeg_stream_map = 'v:0,a:0';
 			for(let i = 1; i < this.number_of_streams; i++){
 				ffmpeg_stream_map = ffmpeg_stream_map + ' v:'+i+',a:'+i;
-			}
+			}*/
 			
 			requestOptions = {
                 method: "PUT",
@@ -426,11 +455,19 @@ const video_player = {
 			this.project_name = this.project_configuration.TC_PROJECT_NAME;
 			this.src_bucket = this.project_configuration.TC_SRC_BUCKET;
 			this.dst_bucket = this.project_configuration.TC_DST_BUCKET;
-			this.number_of_streams =  (this.project_configuration.TC_FFMPEG_CONFIG.match(/-map/g) || []).length/2;
+
+			if(this.project_configuration.TC_FFMPEG_CONFIG.includes("-f dash"))
+				this.protocol = 'dash';
+			else
+				this.protocol = 'hls';
+
+			if(this.protocol == 'hls')
+				this.number_of_streams =  (this.project_configuration.TC_FFMPEG_CONFIG.match(/-map/g) || []).length/2;
+			else
+				this.number_of_streams =  (this.project_configuration.TC_FFMPEG_CONFIG.match(/-map/g) || []).length - 1;
 			
 			var config_split= this.project_configuration.TC_FFMPEG_CONFIG.trim().replaceAll('M', '').split(" ");
 
-			//console.log("%o", config_split);
 			for(let i = 0; i < this.number_of_streams; i++){
 				this.selected_video_resolution[i] = config_split[3+(12*i)];
 				this.selected_video_bitrate[i]  = config_split[5+(12*i)];
@@ -438,6 +475,21 @@ const video_player = {
 				this.selected_video_bitrate_maximum[i] = config_split[7+(12*i)];
 				this.selected_buffer_size[i] = config_split[11+(12*i)];
 			}
+
+			let i = 11 + (12*(this.number_of_streams-1));
+
+			i += 2;
+			if(this.protocol == 'hls'){
+				i += 2*(this.number_of_streams - 1);
+			}
+				
+			this.gop_size = config_split[i + 10];
+			this.codec = config_split[i + 14];
+			if(this.codec == 'libx264' || this.codec == 'libx265'){
+				this.codec = this.codec + " " + config_split[i + 15] + " "+config_split[i + 16];
+				i += 2;
+			}
+			this.seg_dur = config_split[i + 18];
 		},
 		show_options : function(){
 			this.advanced = !this.advanced;

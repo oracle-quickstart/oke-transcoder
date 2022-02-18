@@ -131,8 +131,8 @@ module "transcoder" {
   stream_endpoint = module.oci-stream.messages_endpoint
   admin_tc_user = var.admin_tc_user
   admin_tc_password = var.admin_tc_password
-  ffmpeg_config = var.ffmpeg_config
-  hls_stream_url = var.hls_stream_url
+  ffmpeg_config = var.ffmpeg_streaming_protocol == "DASH" ?  var.ffmpeg_dash_config : var.ffmpeg_hls_config
+  cdn_base_url = var.cdn_base_url
   cpu_request_per_job = var.cpu_request_per_job
   cluster_autoscaling = var.cluster_autoscaling
   oci_cluster_autoscaler_image = var.oci_cluster_autoscaler_image

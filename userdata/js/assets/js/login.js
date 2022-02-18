@@ -1,7 +1,6 @@
 const login = {
 	data() {
 		return {
-			//api_server_address: '',
 			sw: 0,	
 			username: '',
 			password: '',
@@ -9,7 +8,6 @@ const login = {
 			name: '',
 			apikey: '',
 			//is_admin: false,
-			//api_server_address: '129.159.119.35',
 			output: '',
 		}
 	},

@@ -550,7 +550,7 @@ data "template_file" "configmap_template" {
     stream_ocid = var.stream_ocid
     stream_endpoint = var.stream_endpoint
     ffmpeg_config = var.ffmpeg_config
-    hls_stream_url = var.hls_stream_url
+    cdn_base_url = var.cdn_base_url
     db_ip = var.db_ip
     db_name = var.db_name
     db_user = var.db_user

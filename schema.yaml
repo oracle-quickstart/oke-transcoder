@@ -86,7 +86,9 @@ groupings:
 - title: "Transcoding Configuration"
   variables:
   - project_name
-  - ffmpeg_config
+  - ffmpeg_streaming_protocol
+  - ffmpeg_hls_config
+  - ffmpeg_dash_config
 - title: "CDN Configuration"
   variables:
   - hls_stream_url
@@ -370,7 +372,6 @@ variables:
   image_label: 
     type: string
     title: "Transcoder Image Label"
-    default: "1.6"
     required: true
 
   src_bucket: 
@@ -504,11 +505,37 @@ variables:
     title: "Project Name"
     required: true
 
-  ffmpeg_config:
-    type: string
-    title: "FFMPEG Configuration"
+  ffmpeg_streaming_protocol:
+    type: enum
+    title: "Streaming Protocol"
+    default: "HLS"
+    enum:
+       - "HLS"
+       - "DASH"
     required: true
-  
-  hls_stream_url:
+
+  ffmpeg_hls_config:
     type: string
-    title: "HLS Stream URL"
+    title: "FFMPEG HLS Configuration"
+    required: true
+    dependsOn: 
+      ffmpeg_streaming_protocol: ffmpeg_streaming_protocol
+    visible:
+      eq: 
+        - ffmpeg_streaming_protocol
+        - "HLS"
+      
+  ffmpeg_dash_config:
+    type: string
+    title: "FFMPEG DASH Configuration"
+    required: true
+    dependsOn: 
+      ffmpeg_streaming_protocol: ffmpeg_streaming_protocol
+    visible: 
+      eq: 
+        - ffmpeg_streaming_protocol
+        - "DASH"
+
+  cdn_base_url:
+    type: string
+    title: "CDN Base URL"

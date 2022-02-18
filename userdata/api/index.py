@@ -427,8 +427,8 @@ def add_project():
 #  if not data.get('TC_FFMPEG_STREAM_MAP'): 
 #    data['TC_FFMPEG_STREAM_MAP'] = os.environ['TC_FFMPEG_STREAM_MAP']
 
-  if not data.get('TC_FFMPEG_HLS_BASE_URL'): 
-    data['TC_FFMPEG_HLS_BASE_URL'] = os.environ['TC_FFMPEG_HLS_BASE_URL']
+  if not data.get('TC_CDN_BASE_URL'): 
+    data['TC_CDN_BASE_URL'] = os.environ['TC_CDN_BASE_URL']
 
   data['TC_DB_HOST'] = os.environ['TC_DB_HOST']
   data['TC_DB_NAME'] = os.environ['TC_DB_NAME']
@@ -627,7 +627,7 @@ def add_bucket_to_event_rule(bucket, event_rule_id):
       update_rule_response = events_client.update_rule(
         rule_id = event_rule_id,
         update_rule_details=oci.events.models.UpdateRuleDetails(
-          condition='{"eventType":["com.oraclecloud.objectstorage.createobject"], "data":{"additionalDetails":{"bucketName":'+str(buckets).replace("'", "\"")+'}}}'
+          condition='{"eventType":["com.oraclecloud.objectstorage.createobject","com.oraclecloud.objectstorage.updateobject"], "data":{"additionalDetails":{"bucketName":'+str(buckets).replace("'", "\"")+'}}}'
       ))
       return update_rule_response
 

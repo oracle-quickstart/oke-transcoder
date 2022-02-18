@@ -18,7 +18,7 @@
         <link rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
-
+        <script src="assets/js/dash.all.min.js"></script>
     </head>
 
     <body>
@@ -218,6 +218,58 @@
                                 <span class="btn-link" v-show="!advanced" v-on:click="show_options()"> Show Advanced Options</span>
 
                                 <span style="cursor: pointer;" class="btn-link" v-show="advanced" v-on:click="show_options()"> Hide Advanced Options</span>
+
+
+                                <div v-show="advanced" class="row">
+                                    <div class=" col-9 col-sm-9 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-3 mt-3">
+                                        <label for="codec" class="form-label">Codec</label>
+                                        <select id="codec" class="form-select"
+                                            v-model.trim="codec" required>
+                                            <option value="libx264 -sc_threshold 0" selected>H.264</option>
+                                                <option value="libx265 -sc_threshold 0">
+                                                    H.265</option>
+                                                <option value="libvpx-vp9">
+                                                    VP9</option>
+                                                <option value="libaom-av1">
+                                                    AV1</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div v-show="advanced" class="row">
+                                    <div class=" col-9 col-sm-9 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-3">
+                                        <span>Streaming Protocol</span>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="hls" v-model="protocol">
+                                            <label class="form-check-label" for="flexRadioDefault1">HLS
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="dash" v-model="protocol">
+                                            <label class="form-check-label" for="flexRadioDefault2">
+                                                DASH
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-show="advanced" class="row">
+                                    <div class=" col-9 col-sm-9 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-3">
+                                        <label for="seg_duration" class="form-label">Segment Duration</label>
+                                        <input id="seg_duration" class="form-control" type="number"
+                                        min="1" max="100" step="1"
+                                            v-model="seg_dur" required>
+                                    </div>
+                                </div>
+
+                                <div v-show="advanced" class="row">
+                                    <div class=" col-9 col-sm-9 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-3">
+                                        <label for="seg_duration" class="form-label">GOP Size</label>
+                                        <input id="seg_duration" class="form-control" type="number"
+                                        min="1" max="100" step="1"
+                                            v-model="gop_size" required>
+                                    </div>
+                                </div>
 
                                 <p class="mt-3 mb-3" v-show="advanced">Note: All rates and sizes are in Millions</p>
 
@@ -501,7 +553,7 @@
                     <p>TC_DST_BUCKET : {{project_configuration.TC_DST_BUCKET}}</p>
                     <p>TC_FFMPEG_CONFIG : {{project_configuration.TC_FFMPEG_CONFIG}}</p>
                     <!--p>TC_FFMPEG_STREAM_MAP : {{project_configuration.TC_FFMPEG_STREAM_MAP}}</p-->
-                    <p>TC_FFMPEG_HLS_BASE_URL : {{project_configuration.TC_FFMPEG_HLS_BASE_URL}}</p>
+                    <!--p>TC_FFMPEG_HLS_BASE_URL : {{project_configuration.TC_FFMPEG_HLS_BASE_URL}}</p-->
                     <p>TC_DB_HOST : {{project_configuration.TC_DB_HOST}}</p>
                     <p>TC_DB_NAME : {{project_configuration.TC_DB_NAME}}</p>
                     <p>TC_DB_USER : {{project_configuration.TC_DB_USER}}</p>

@@ -1,11 +1,6 @@
-var userName = "RestApiUser";
-var passWord = "Tr@nsc0de!";
-
 const project = {
 	data() {
 		return {
-			//api_server_address: '',	
-			//api_server_address: '150.230.163.128',
 			projects: '',
 			jobs: '',
 			filtered_jobs: '',
@@ -21,6 +16,10 @@ const project = {
 			new_dst_bucket: '',
 			advanced: false,
 			number_of_streams: 3,
+			codec: 'libx264 -sc_threshold 0',
+			seg_dur: 5,
+			gop_size: 48,
+			protocol: 'hls',
 			selected_video_resolution: ['1920x1080', '1280x720', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360', '640x360'],
             selected_video_bitrate : [5, 3, 1, 1, 1, 1, 1, 1, 1, 1],
             selected_video_bitrate_minimum : [5, 3, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -103,16 +102,15 @@ const project = {
 			const response = await fetch('api/v1/projects', requestOptions)
 			.then(function (response) {
 				if (!response.ok){
-					alert('Unable to Fetch Projects!');
-					return null;
+					return;
 				}
 				else
 					return response.json();
 			});
-			/*if(response){
+			if(response){
 				this.projects = response.data;
-				window.localStorage.setItem("api-server-address",this.api_server_address);
-			}*/
+				//window.localStorage.setItem("api-server-address",this.api_server_address);
+			}
 
 		},
 
@@ -165,17 +163,28 @@ const project = {
 
 		create_project: async function(){
 			var ffmpeg_command = ' ';
+
 			for(let i = 0; i < this.number_of_streams; i++){
 				ffmpeg_command = ffmpeg_command + ' -map v:0 -s:'+i+' '+ this.selected_video_resolution[i]+ ' -b:v:'+i+' '+ this.selected_video_bitrate[i]+'M -maxrate '+ this.selected_video_bitrate_maximum[i]+'M -minrate '+ this.selected_video_bitrate_minimum[i]+'M -bufsize '+ this.selected_buffer_size[i] +'M';
 			}
-			for(let i = 0; i < this.number_of_streams; i++){
-				ffmpeg_command = ffmpeg_command + ' -map a:0'
+
+			ffmpeg_command = ffmpeg_command + ' -map a:0?';
+			if(this.protocol == 'hls'){
+				for(let i = 1; i < this.number_of_streams; i++){
+					ffmpeg_command = ffmpeg_command + ' -map a:0?';
+				}
 			}
-			ffmpeg_command = ffmpeg_command + ' -c:a aac -b:a 128k -ac 1 -ar 44100 -g 48 -sc_threshold 0 -c:v libx264 -f hls -hls_time 5 -hls_playlist_type vod -hls_segment_filename stream_%v_%03d.ts -master_pl_name master.m3u8 ';
-			var ffmpeg_stream_map = 'v:0,a:0';
+			ffmpeg_command = ffmpeg_command + ' -c:a aac -b:a 128k -ac 1 -ar 44100 -keyint_min ' + this.gop_size +' -g ' + this.gop_size+ ' -c:v ' + this.codec + ' -f '+ this.protocol;
+			
+			if(this.protocol == 'hls')
+				ffmpeg_command = ffmpeg_command + ' -hls_time ' + this.seg_dur+ ' -hls_playlist_type vod -hls_segment_filename stream_%v_%03d.ts -master_pl_name master.m3u8 ';
+			else
+				ffmpeg_command = ffmpeg_command + ' -seg_duration ' + this.seg_dur+ ' -use_template 1 -use_timeline 1';
+
+			/*var ffmpeg_stream_map = 'v:0,a:0';
 			for(let i = 1; i < this.number_of_streams; i++){
 				ffmpeg_stream_map = ffmpeg_stream_map + ' v:'+i+',a:'+i;
-			}
+			}*/
 			requestOptions = {
                 method: "POST",
                 headers: { "Content-Type": "application/json",},// "Authorization": "Basic " + btoa(userName + ":" + passWord)},
