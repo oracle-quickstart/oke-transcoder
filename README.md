@@ -71,6 +71,8 @@ VM.Standard.E4.Flex (AMD)
 
 VM.Optimized3.Flex (Intel) 
 
+VM.Standard3.Flex (Intel)
+
 VM.Standard.A1.Flex (ARM Ampere)
 
 
@@ -140,7 +142,7 @@ It deploys the following:
 
 Simply click the Deploy to OCI button to create an ORM stack, then walk through the menu driven deployment.  Once the stack is created, use the Terraform Actions drop-down menu to Plan, then Apply the stack.
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.5.zip)
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/mprestin77/oci-oke-transcoder/archive/refs/tags/v1.6.zip)
     
 When applying the stack remote execution logging is done in terraform output directly. When the stack is successfully applied it prints SSH key and public IP address of the staging-server VM. SSH access is enabled to the staging-server VM. 
 
