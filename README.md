@@ -110,7 +110,7 @@ By default ffmpeg is set with HLS transcoding to 3 different resolutions
 
 ![image](https://user-images.githubusercontent.com/54962742/133630928-e10daf51-e210-4634-bd15-280674f2c0f3.png)
 
-If you change ffmpeg transcoding parameters and set them incorrectly, the transcoding jobs will start failing.
+If you change ffmpeg transcoding parameters and set them incorrectly, the transcoding jobs may start failing.
 
 Setting CDN Base URL is optional. Set it only if you are integrating it with a CDN and you know the CDN base URL
 
