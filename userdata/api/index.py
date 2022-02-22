@@ -384,7 +384,7 @@ def add_project():
         return jsonify(error="request body cannot be empty"), 400
 
   if data.get('TC_PROJECT_NAME'):
-    name = data['TC_PROJECT_NAME']
+    name = data['TC_PROJECT_NAME'].lower()
   else:
     return jsonify(error="TC_PROJECT_NAME must be set in the request body"), 400
 
