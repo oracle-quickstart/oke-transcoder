@@ -1,6 +1,6 @@
 # FFMPEG Transcoder on OCI OKE
 
-This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on [Oracle Kubernetes Engine (OKE)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) for transcoding to adaptive bitrate streaming.  It supporting both HLS and DASH streaming protocols with the following codecs:
+This quickstart template deploys [FFMPEG transcoder](https://www.ffmpeg.org/) on [Oracle Kubernetes Engine (OKE)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) for transcoding to adaptive bitrate streaming.  It supports both HLS and DASH streaming protocols with the following codecs:
 
 * H.264/AVC
 * H.265/HEVC
