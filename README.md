@@ -110,13 +110,9 @@ By default ffmpeg is set with HLS transcoding to 3 different resolutions
 
 ![image](https://user-images.githubusercontent.com/54962742/133630928-e10daf51-e210-4634-bd15-280674f2c0f3.png)
 
-If you change the number of stream in FFMPEG Configuration you need to change FFMPEG Stream Map accordingly
+If you change ffmpeg transcoding parameters and set them incorrectly, the transcoding jobs will start failing.
 
-![image](https://user-images.githubusercontent.com/54962742/133629514-3d8600d8-61de-4ae3-bda9-4b5555a46aea.png)
-
-If you set transcoding parameters incorrectly transcoding jobs will start failing.
-
-Setting HLS Stream URL is optional. Set it only if you are integrating it with a CDN and you know the CDN base URL
+Setting CDN Base URL is optional. Set it only if you are integrating it with a CDN and you know the CDN base URL
 
 ![image](https://user-images.githubusercontent.com/54962742/133629665-a1a58b0a-e107-4891-b747-c553320cc2a8.png)
 
