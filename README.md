@@ -108,9 +108,13 @@ When configuring MySQL parameters specify password for both the mysql admin and 
 
 By default ffmpeg is set with HLS transcoding to 3 different resolutions
 
+![image](https://user-images.githubusercontent.com/54962742/155228156-d4ef63d7-56fc-4809-8dfb-85d62be353f5.png)
+
+Here is a complete set of ffmpeg parameters used by the default project "transcode":
+
 ![image](https://user-images.githubusercontent.com/54962742/133630928-e10daf51-e210-4634-bd15-280674f2c0f3.png)
 
-If you change ffmpeg transcoding parameters and set them incorrectly, the transcoding jobs may start failing.
+It is recommended to leave ffmpeg default settings intact. If you change ffmpeg transcoding parameters and set them incorrectly, the transcoding jobs may start failing. After the deployment of the stack you'll be able to create new projects with a different configuration from the transcoder UI.
 
 Setting CDN Base URL is optional. Set it only if you are integrating it with a CDN and you know the CDN base URL
 
