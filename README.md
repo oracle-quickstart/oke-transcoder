@@ -104,6 +104,10 @@ When configuring MySQL parameters specify password for both the mysql admin and 
 
 ![image](https://user-images.githubusercontent.com/54962742/133627784-19f8afcb-9bfa-4e4b-9c76-01bd9777d600.png)
 
+In User Configuration enter user credentials of the administrative user. This user credentials will allow you to access transcoder UI and manage other users.
+
+![image](https://user-images.githubusercontent.com/54962742/155814202-baf84d29-bc53-4bff-90bd-0840c1641be7.png)
+
 # FFPEG Transcoding parameters
 
 By default ffmpeg is set with HLS transcoding to 3 different resolutions
