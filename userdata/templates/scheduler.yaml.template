@@ -3,13 +3,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: transcoder
-  namespace: transcode
+  namespace: ${namespace}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: transcoder-role
-  namespace: transcode
+  namespace: ${namespace}
 rules:
   - apiGroups: ["batch", "extensions"]
     resources: ["jobs"]
@@ -34,7 +34,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: transcoder-rolebinding
-  namespace: transcode
+  namespace: ${namespace}
 subjects:
   - kind: ServiceAccount
     name: transcoder
@@ -47,7 +47,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: job-scheduler
-  namespace: transcode
+  namespace: ${namespace}
   labels:
     app: job-scheduler
 spec:

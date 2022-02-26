@@ -48,13 +48,13 @@ def create_job(api_instance, job):
     # Create job
     api_response = api_instance.create_namespaced_job(
         body=job,
-        namespace="transcode")
+        namespace="${namespace}")
     print("Job created. status='%s'" % str(api_response.status), flush=True)
 
 def delete_job(api_instance, job_name):
     api_response = api_instance.delete_namespaced_job(
         name=job_name,
-        namespace="transcode",
+        namespace="${namespace}",
         body=client.V1DeleteOptions(
             propagation_policy='Foreground',
             grace_period_seconds=5))

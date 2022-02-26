@@ -227,6 +227,7 @@ data "template_file" "new_job" {
     db_name = var.db_name
     db_user = var.db_user
     db_password = var.db_password
+    namespace = var.namespace
   }
 }
 
