@@ -146,16 +146,11 @@ variables:
     visible: create_new_oke_cluster
 
   kubernetes_version:
-    type: enum
-    enum:
-    - "v1.20.8"
-    - "v1.19.7"
-    - "v1.19.2"
-    - "v1.18.10"
+    type: string
     title: "Kubernetes Version"
     description: "Choose the version of Kubernetes to deploy"
     required: true
-    default: "v1.20.8"
+    default: "Latest"
     visible: create_new_oke_cluster
 
   cluster_name:

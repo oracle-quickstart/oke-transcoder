@@ -1,6 +1,6 @@
 resource "oci_containerengine_cluster" "oke_cluster" {
   compartment_id     = var.compartment_ocid
-  kubernetes_version = var.kubernetes_version
+  kubernetes_version = (var.kubernetes_version == "Latest") ? local.cluster_k8s_latest_version : var.kubernetes_version
   name               = var.cluster_name
   vcn_id             = var.vcn_id
 
@@ -27,7 +27,7 @@ resource "oci_containerengine_cluster" "oke_cluster" {
 resource "oci_containerengine_node_pool" "oke_node_pool" {
   cluster_id         = var.create_new_oke_cluster ? oci_containerengine_cluster.oke_cluster[0].id : var.existing_oke_cluster_id
   compartment_id     = var.compartment_ocid
-  kubernetes_version = var.kubernetes_version
+  kubernetes_version = (var.kubernetes_version == "Latest") ? local.node_pool_k8s_latest_version : var.kubernetes_version
   name               = var.oke_nodepool_name
   node_shape         = var.oke_nodepool_shape
   ssh_public_key     = var.ssh_public_key
