@@ -224,3 +224,18 @@ After the stack is successfully applied to check that the transcoder is working
     kubectl -n transcode delete svc --all
   
   This command deletes the load balancer associated with the transcoder service. After that you can open RM stack in OCI console and destroy it.
+
+## Contributing
+
+This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+
+## Security
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## License
+
+Copyright (c) 2021 Oracle and/or its affiliates.
+
+Released under the Universal Permissive License v1.0 as shown at
+<https://oss.oracle.com/licenses/upl/>.
