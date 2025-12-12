@@ -35,10 +35,10 @@ resource "random_string" "deploy_id" {
 }
 
 # OEL Image lookup
-data "oci_core_images" "oraclelinux7" {
+data "oci_core_images" "oraclelinux8" {
   compartment_id = var.compartment_ocid
   operating_system = "Oracle Linux"
-  operating_system_version = "7.9"
+  operating_system_version = "8"
   shape = var.oke_nodepool_shape
 #  filter {
 #    name = "display_name"

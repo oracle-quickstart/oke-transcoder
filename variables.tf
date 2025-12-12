@@ -81,7 +81,7 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  default = "v1.20.8"
+  default = "v1.34.1"
 }
 
 variable "oke_nodepool_name" {
@@ -89,7 +89,7 @@ variable "oke_nodepool_name" {
 }
 
 variable "oke_nodepool_shape" {
-  default = "VM.Standard.E3.Flex"
+  default = "VM.Standard.E5.Flex"
 }
 
 variable "oke_node_ocpu" {
@@ -136,7 +136,7 @@ variable "cluster_autoscaling" {
 # https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm
 
 variable "oci_cluster_autoscaler_image" {
-  default = "iad.ocir.io/oracle/oci-cluster-autoscaler:1.20.0-4"
+  default = "iad.ocir.io/oracle/oci-cluster-autoscaler:1.33.0-3"
 }
 
 variable "min_worker_nodes" {
@@ -167,7 +167,7 @@ variable "repo_name" {
 
 # Set the user to login OCIR registry
 variable "registry_user" {
-  default = "oracleidentitycloudservice/<username>"
+  default = "<username>"
 }
 
 variable "image_label" {
@@ -203,7 +203,7 @@ variable "mysql_admin_password" {
 
 
 variable "mysql_shape" {
-  default = "VM.Standard.E2.2"
+  default = "MySQL.VM.Standard.E4.1.16GB"
 }
 
 variable "enable_backups" {
@@ -262,7 +262,7 @@ variable "stg_server_name" {
 }
 
 variable "stg_server_shape" {
-  default = "VM.Standard.E4.Flex"
+  default = "VM.Standard.E5.Flex"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -274,7 +274,7 @@ variable "admin_tc_user" {
 }
 
 variable "admin_tc_password" {
-  default = "Tr@nsc0de!"
+  default = ""
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

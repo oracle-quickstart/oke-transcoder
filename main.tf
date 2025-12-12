@@ -57,7 +57,7 @@ module "oke" {
   oke_node_memory = var.oke_node_memory
   cluster_options_add_ons_is_kubernetes_dashboard_enabled =  var.cluster_options_add_ons_is_kubernetes_dashboard_enabled
   cluster_options_admission_controller_options_is_pod_security_policy_enabled = var.cluster_options_admission_controller_options_is_pod_security_policy_enabled
-  image_id = data.oci_core_images.oraclelinux7.images.0.id 
+  image_id = data.oci_core_images.oraclelinux8.images.0.id 
   vcn_id = var.useExistingVcn ? var.myVcn : module.network.vcn-id
   subnet_id = var.useExistingVcn ? var.OKESubnet : local.is_oke_public
   lb_subnet_id = module.network.edge-id
@@ -72,7 +72,7 @@ module "stg-server" {
   compartment_ocid = var.compartment_ocid
 #  availability_domain = data.oci_identity_availability_domain.ad.name
   availability_domain = var.availability_domain
-  image_id = data.oci_core_images.oraclelinux7.images.0.id 
+  image_id = data.oci_core_images.oraclelinux8.images.0.id 
 #  instance_shape   = var.stg_server_shape
   instance_shape   = var.oke_nodepool_shape == "VM.Standard.A1.Flex" ? "VM.Standard.A1.Flex" : var.stg_server_shape
   instance_name = var.stg_server_name

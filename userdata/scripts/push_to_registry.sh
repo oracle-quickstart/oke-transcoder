@@ -9,11 +9,11 @@ auth_token=`oci secrets secret-bundle get --secret-id ${secret_id} --stage CURRE
 #tenancy_name=`oci iam tenancy get --tenancy-id $tenancy_id | jq ."data.name" | tr -d '"'`
 
 # Login OCI registry
-docker login ${registry} -u ${tenancy_name}/${registry_user} -p $auth_token
+docker login ${registry} -u ${os_namespace}/${registry_user} -p $auth_token
 
 # Tag container image
-docker tag "$image_name:${image_label}" ${registry}/${tenancy_name}/${repo_name}/$image_name:${image_label}
+docker tag "$image_name:${image_label}" ${registry}/${os_namespace}/${repo_name}/$image_name:${image_label}
 
 # Push container image to OCI registry
-docker push ${registry}/${tenancy_name}/${repo_name}/$image_name:${image_label}
+docker push ${registry}/${os_namespace}/${repo_name}/$image_name:${image_label}
 

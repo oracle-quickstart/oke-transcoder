@@ -17,7 +17,7 @@ resource null_resource "install_oci_cli" {
 
   provisioner "file" {
     content     = data.template_file.install_oci_cli.rendered
-    destination = "~/cli_config.sh"
+    destination = "/home/opc/cli_config.sh"
   }
 
   provisioner "remote-exec" {
@@ -62,7 +62,7 @@ resource "null_resource" "create_db" {
 
   provisioner "file" {
     content     = data.template_file.create_db.rendered
-    destination = "~/transcoder/build/create_db.sh"
+    destination = "/home/opc/transcoder/build/create_db.sh"
   }
 
   provisioner "remote-exec" {
@@ -97,7 +97,7 @@ resource "null_resource" "install_kubectl" {
 
   provisioner "file" {
     content     = data.template_file.install_kubectl.rendered
-    destination = "~/install_kubectl.sh"
+    destination = "/home/opc/install_kubectl.sh"
   }
 
   provisioner "remote-exec" {
@@ -133,7 +133,7 @@ resource "null_resource" "generate_kubeconfig" {
 
   provisioner "file" {
     content     = data.template_file.generate_kubeconfig.rendered
-    destination = "~/generate_kubeconfig.sh"
+    destination = "/home/opc/generate_kubeconfig.sh"
   }
 
   provisioner "remote-exec" {
@@ -168,7 +168,7 @@ resource "null_resource" "node_lifecycle" {
 
   provisioner "file" {
     content     = data.template_file.check_node_lifecycle.rendered
-    destination = "~/is_worker_active.sh"
+    destination = "/home/opc/is_worker_active.sh"
   }
 
   provisioner "remote-exec" {
@@ -201,7 +201,7 @@ resource "null_resource" "install_docker" {
 
   provisioner "file" {
     content     = data.template_file.install_docker.rendered
-    destination = "~/install_docker.sh"
+    destination = "/home/opc/install_docker.sh"
   }
 
   provisioner "remote-exec" {
@@ -250,17 +250,17 @@ resource "null_resource" "build_scheduler_docker_image" {
 
   provisioner "file" {
     content     = data.template_file.scheduler_dockerfile.rendered
-    destination = "~/transcoder/scheduler/Dockerfile"
+    destination = "/home/opc/transcoder/scheduler/Dockerfile"
   }
   
   provisioner "file" {
     content     = data.template_file.consumer.rendered
-    destination = "~/transcoder/scheduler/consumer.py"
+    destination = "/home/opc/transcoder/scheduler/consumer.py"
   }
 
   provisioner "file" {
     content     = data.template_file.new_job.rendered
-    destination = "~/transcoder/scheduler/new_job.py"
+    destination = "/home/opc/transcoder/scheduler/new_job.py"
   }
 
   provisioner "remote-exec" {
@@ -302,12 +302,12 @@ resource "null_resource" "build_transcoder_docker_image" {
 
   provisioner "file" {
     content     = data.template_file.transcoder_dockerfile.rendered
-    destination = "~/transcoder/transcode/Dockerfile"
+    destination = "/home/opc/transcoder/transcode/Dockerfile"
   }
   
   provisioner "file" {
     content     = data.template_file.transcode.rendered
-    destination = "~/transcoder/transcode/transcode.sh"
+    destination = "/home/opc/transcoder/transcode/transcode.sh"
   }
 
   provisioner "remote-exec" {
@@ -354,17 +354,17 @@ resource "null_resource" "build_api_docker_image" {
 
   provisioner "file" {
     content     = data.template_file.api_dockerfile.rendered
-    destination = "~/transcoder/api/Dockerfile"
+    destination = "/home/opc/transcoder/api/Dockerfile"
   }
   
   provisioner "file" {
     content     = data.template_file.api_bootstrap.rendered
-    destination = "~/transcoder/api/bootstrap.sh"
+    destination = "/home/opc/transcoder/api/bootstrap.sh"
   }
 
   provisioner "file" {
     content     = data.template_file.api_index.rendered
-    destination = "~/transcoder/api/index.py"
+    destination = "/home/opc/transcoder/api/index.py"
   }
 
   provisioner "remote-exec" {
@@ -404,17 +404,17 @@ resource "null_resource" "build_nginx_docker_image" {
 
   provisioner "file" {
     content     = data.template_file.nginx_dockerfile.rendered
-    destination = "~/transcoder/nginx/Dockerfile"
+    destination = "/home/opc/transcoder/nginx/Dockerfile"
   }
 
   provisioner "file" {
     content     = data.template_file.nginx_conf.rendered
-    destination = "~/transcoder/nginx/nginx.conf"
+    destination = "/home/opc/transcoder/nginx/nginx.conf"
   }
 
   provisioner "file" {
     source     = "${path.module}/../../userdata/js"
-    destination = "~/transcoder/nginx"
+    destination = "/home/opc/transcoder/nginx"
   }   
 
   provisioner "remote-exec" {
@@ -433,7 +433,7 @@ data "template_file" "push_to_registry" {
     registry = var.registry
     repo_name = var.repo_name
     registry_user = var.registry_user
-    tenancy_name = data.oci_identity_tenancy.my_tenancy.name
+    os_namespace = data.oci_objectstorage_namespace.lookup.namespace
     region = var.region
     image_label = var.image_label
   }
@@ -452,7 +452,7 @@ resource "null_resource" "push_to_registry" {
 
   provisioner "file" {
     content     = data.template_file.push_to_registry.rendered
-    destination = "~/transcoder/build/push_to_registry.sh"
+    destination = "/home/opc/transcoder/build/push_to_registry.sh"
   }
   
   provisioner "remote-exec" {
@@ -499,7 +499,7 @@ resource "null_resource" "cluster_autoscaler" {
 
   provisioner "file" {
     content     = data.template_file.cluster_autoscaler_template.rendered
-    destination = "~/transcoder/build/cluster-autoscaler.yaml"
+    destination = "/home/opc/transcoder/build/cluster-autoscaler.yaml"
   } 
 
   provisioner "remote-exec" {
@@ -618,32 +618,32 @@ resource "null_resource" "deploy_containers" {
 
   provisioner "file" {
     content     = data.template_file.configmap_template.rendered
-    destination = "~/transcoder/build/configmap.yaml"
+    destination = "/home/opc/transcoder/build/configmap.yaml"
   }  
 
   provisioner "file" {
     content     = data.template_file.scheduler_template.rendered
-    destination = "~/transcoder/build/scheduler.yaml"
+    destination = "/home/opc/transcoder/build/scheduler.yaml"
   }  
 
   provisioner "file" {
     content     = data.template_file.api_server_template.rendered
-    destination = "~/transcoder/build/api-server.yaml"
+    destination = "/home/opc/transcoder/build/api-server.yaml"
   } 
 
   provisioner "file" {
     content     = data.template_file.db_secret_template.rendered
-    destination = "~/transcoder/build/db-secret.yaml"
+    destination = "/home/opc/transcoder/build/db-secret.yaml"
   }  
 
   provisioner "file" {
     content     = data.template_file.deploy.rendered
-    destination = "~/transcoder/build/deploy.sh"
+    destination = "/home/opc/transcoder/build/deploy.sh"
   }
 
   provisioner "file" {
     content     = data.template_file.generate_admin_password.rendered
-    destination = "~/transcoder/build/generate_admin_password.py"
+    destination = "/home/opc/transcoder/build/generate_admin_password.py"
   }
 
   provisioner "remote-exec" {
