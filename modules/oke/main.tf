@@ -2,6 +2,7 @@ resource "oci_containerengine_cluster" "oke_cluster" {
   compartment_id     = var.compartment_ocid
   kubernetes_version = (var.kubernetes_version == "Latest") ? local.cluster_k8s_latest_version : var.kubernetes_version
   name               = var.cluster_name
+  type               = var.cluster_type #ENHANCED_CLUSTER or BASIC_CLUSTER
   vcn_id             = var.vcn_id
 
   #Optional

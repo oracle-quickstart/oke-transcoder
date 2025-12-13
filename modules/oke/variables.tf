@@ -18,6 +18,7 @@ variable "create_new_oke_cluster" {}
 variable "existing_oke_cluster_id" {}
 variable "cluster_endpoint_config_is_public_ip_enabled" {}
 variable "cni_type" {}
+variable "cluster_type" {}
 locals {
   cluster_k8s_latest_version   = reverse(sort(data.oci_containerengine_cluster_option.oke.kubernetes_versions))[0]
   node_pool_k8s_latest_version = reverse(sort(data.oci_containerengine_node_pool_option.oke.kubernetes_versions))[0]
