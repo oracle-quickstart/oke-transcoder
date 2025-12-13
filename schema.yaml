@@ -265,7 +265,7 @@ variables:
     visible: create_new_oke_cluster
     dependsOn:
       compartmentId: compartment_ocid
-    default: "VM.Standard.E3.Flex"
+    default: "VM.Standard.E5.Flex"
 
   oke_nodepool_size:
     type: int
@@ -428,13 +428,12 @@ variables:
   mysql_shape:
     type: enum
     enum:
-    - "VM.Standard.E2.1"
-    - "VM.Standard.E2.2"
-    - "VM.Standard.E2.3"
-    - "VM.Standard.E2.4"
+    - "MySQL.VM.Standard.E4.1.16GB"
+    - "MySQL.VM.Standard.E4.2.32GB"
+    - "MySQL.VM.Standard.E4.4.64GB
     title: "OCI MySQL instance shape"
     description: "Shape of the OCI MySQL intance"
-    default: "VM.Standard.E2.2"
+    default: "MySQL.VM.Standard.E4.1.16GB"
 
   enable_backups:
     type: boolean
@@ -470,7 +469,7 @@ variables:
     title: "Staging Server Instance Shape"
     dependsOn:
       compartmentId: compartment_ocid
-    default: "VM.Standard.E3.Flex"
+    default: "VM.Standard.E5.Flex"
     required: true
 
   public_edge_node:

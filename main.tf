@@ -49,6 +49,8 @@ module "oke" {
   tenancy_ocid = var.tenancy_ocid
   compartment_ocid = var.compartment_ocid
   cluster_name = var.cluster_name
+  cni_type = var.cni_type
+  cluster_type = var.cluster_type
   kubernetes_version = var.kubernetes_version
   oke_nodepool_name = var.oke_nodepool_name
   oke_nodepool_shape = var.oke_nodepool_shape

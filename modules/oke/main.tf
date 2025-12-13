@@ -4,6 +4,11 @@ resource "oci_containerengine_cluster" "oke_cluster" {
   name               = var.cluster_name
   vcn_id             = var.vcn_id
 
+  #Optional
+  cluster_pod_network_options {
+    cni_type = var.cni_type
+  }
+
   endpoint_config {
     is_public_ip_enabled = var.cluster_endpoint_config_is_public_ip_enabled
     # nsg_ids = var.cluster_endpoint_config_nsg_ids

@@ -84,6 +84,18 @@ variable "kubernetes_version" {
   default = "v1.34.1"
 }
 
+variable "cni_type" {
+  description = "CNI type (e.g., OCI_VCN_IP_NATIVE or FLANNEL_OVERLAY)."
+  type        = string
+  default     = "OCI_VCN_IP_NATIVE"
+}
+
+variable "cluster_type" {
+  description = "OKE cluster type (ENHANCED_CLUSTER or BASIC_CLUSTER)."
+  type        = string
+  default     = "ENHANCED_CLUSTER"
+}
+
 variable "oke_nodepool_name" {
   default = "tc-nodepool"
 }
@@ -203,7 +215,7 @@ variable "mysql_admin_password" {
 
 
 variable "mysql_shape" {
-  default = "MySQL.VM.Standard.E4.1.16GB"
+  default = ""
 }
 
 variable "enable_backups" {
