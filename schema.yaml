@@ -430,7 +430,7 @@ variables:
     enum:
     - "MySQL.VM.Standard.E4.1.16GB"
     - "MySQL.VM.Standard.E4.2.32GB"
-    - "MySQL.VM.Standard.E4.4.64GB
+    - "MySQL.VM.Standard.E4.4.64GB"
     title: "OCI MySQL instance shape"
     description: "Shape of the OCI MySQL intance"
     default: "MySQL.VM.Standard.E4.1.16GB"
