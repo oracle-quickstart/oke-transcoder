@@ -111,7 +111,7 @@ variables:
   use_remote_exec: 
     type: boolean
     title: "Use Remote Execution"
-    description: "By default this deployment will use a remote execution that requires ssh access to the staging VM using it's public IP.  If remote access using a public IP is disabled in your VCN then CloudInit deployment must be used instead. This allows to deploy the stack on a network that is not internet facing. CloudInit deployment has not been implemented yet"
+    description: "By default this deployment will use a remote execution that requires ssh access to the staging VM using it's public IP.  If remote access using a public IP is disabled in your VCN then CloudInit deployment must be used instead. This allows to deploy the stack on a network that is not internet facing. CloudInit deployment has not been implemented yet "
     default: true
     
   ssh_provided_public_key:
