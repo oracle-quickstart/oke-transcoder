@@ -148,7 +148,7 @@ variable "cluster_autoscaling" {
 # https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm
 
 variable "oci_cluster_autoscaler_image" {
-  default = "iad.ocir.io/oracle/oci-cluster-autoscaler:1.33.0-3"
+  default = "phx.ocir.io/oracle/oci-cluster-autoscaler:1.33.0-3"
 }
 
 variable "min_worker_nodes" {
@@ -192,7 +192,7 @@ variable "image_label" {
 # Set it to secret OCID where you store authentication token that is used to push/pull images from OCIR
 # ---------------------------------------------------------------------------------------------------------------------
 variable "vault_secret_id" {
-  default = "<OCID of valut secret where authemtication token is stored>"
+  default = "<OCID of vault secret where authemtication token is stored>"
 }
 
 

@@ -314,7 +314,7 @@ variables:
     type: string
     title: "Cluster Autoscaler Image"
     description: "Set this to the target region you are deploying to. For the list available OCI Cluster Autoscaler images see https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengusingclusterautoscaler.htm"
-    default: "iad.ocir.io/oracle/oci-cluster-autoscaler:1.20.0-4"
+    default: "phx.ocir.io/oracle/oci-cluster-autoscaler:1.33.0-3"
     required: true
     visible: cluster_autoscaling
 
@@ -349,7 +349,7 @@ variables:
    type: string
    title: "OCI Registry"
    description: "Set this to the target region you are deploying to"
-   default: "iad.ocir.io"
+   default: "phx.ocir.io"
    required: true
 
   repo_name:
@@ -362,7 +362,7 @@ variables:
     title: "OCI Registry Username"
     description: "Set this to your username for OCI Registry"
     required: true
-    default: "oracleidentitycloudservice/<username>"
+    default: "<username>"
 
   image_label: 
     type: string
