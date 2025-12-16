@@ -48,7 +48,13 @@ resource "oci_containerengine_node_pool" "oke_node_pool" {
       }
     }
     size = var.oke_nodepool_size
+
+    node_pool_pod_network_option_details {
+        cni_type       = var.cni_type
+        pod_subnet_ids = (var.cni_type == "OCI_VCN_IP_NATIVE") ? [var.subnet_id] : []
+    }
   }
+  
 
   dynamic "node_shape_config" {
     for_each = length(regexall("Flex", var.oke_nodepool_shape)) > 0 ? [1] : []
