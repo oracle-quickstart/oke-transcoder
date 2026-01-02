@@ -29,6 +29,7 @@ After creating the dynamic group, you should set specific [IAM policies](https:/
 
 At a minimum, the following policies are required:
 
+```
     Allow dynamic-group <dynamic group name> to manage cluster-family in compartment id <compartment OCID>
     Allow dynamic-group <dynamic group name> to manage secret-family in compartment id <compartment OCID>
     Allow dynamic-group <dynamic group name> to manage vaults in compartment id <compartment OCID>
@@ -42,6 +43,7 @@ At a minimum, the following policies are required:
     Allow dynamic-group <dynamic-group-name> to manage mysql-family in compartment id <compartment OCID>
     Allow dynamic-group <dynamic-group-name> to inspect compartments in compartment id <compartment OCID>
     Allow dynamic-group <dynamic-group-name> to manage cloudevents-rules in compartment id <compartment OCID>
+```
 
 Also required prior to deployment are an [OCI Registry](https://docs.oracle.com/en-us/iaas/Content/Registry/Concepts/registryoverview.htm), [OCI Vault](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm), [Auth Token](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm#create_swift_password), and a [Vault Secret](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingsecrets.htm) which contains the Auth Token.  
 
